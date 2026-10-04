@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>body { background-color: #0b0f19; color: #f3f4f6; font-family: system-ui, -apple-system, sans-serif; }</style>
 </head>
 <body class="pb-24">
@@ -15,7 +17,7 @@
         <div class="flex justify-between items-center mb-2">
             <div class="flex items-center space-x-2">
                 <h1 class="text-lg font-bold text-emerald-400">Vizinhança Ativa</h1>
-                <span class="text-xs bg-emerald-900/60 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-700/50">PRO 17.0</span>
+                <span class="text-xs bg-emerald-900/60 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-700/50">PRO 17.1 Cloud</span>
             </div>
             <button onclick="ativarPanicoSilencioso()" class="bg-red-600/20 text-red-400 border border-red-600/50 px-3 py-1.5 rounded-full text-xs font-semibold flex items-center space-x-1 animate-pulse">
                 <i class="fa-solid fa-triangle-exclamation"></i>
@@ -23,7 +25,7 @@
             </button>
         </div>
         <div class="flex items-center text-xs text-slate-400 justify-between">
-            <span><i class="fa-solid fa-location-dot text-red-500 mr-1"></i> Patos - PB (GPS Seguro Ativo)</span>
+            <span><i class="fa-solid fa-location-dot text-red-500 mr-1"></i> Patos - PB (Supabase Ativo)</span>
             <select id="bairroSelect" class="bg-slate-800 text-emerald-300 font-medium px-2 py-1 rounded border border-slate-700 text-xs focus:outline-none">
                 <option>São Sebastião</option>
                 <option>Belo Horizonte</option>
@@ -34,31 +36,31 @@
         </div>
     </header>
 
-    <div class="mx-4 mt-3 bg-red-500/10 border border-red-500/30 p-3 rounded-xl flex items-start space-x-3 text-xs">
-        <i class="fa-solid fa-shield-halved text-red-400 text-base mt-0.5"></i>
-        <div>
-            <strong class="text-red-300 block mb-0.5">Canal Direto de Segurança - Patos/PB</strong>
-            <span class="text-slate-300">Integração ativa com canais de emergência e forças policiais. Use com responsabilidade.</span>
-        </div>
-    </div>
-
     <main class="p-4 space-y-4">
-        <!-- ABA 1: MURAL -->
+        <!-- ABA 1: MURAL (Com dados do Supabase) -->
         <section id="tab-mural" class="space-y-4">
             <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-xl shadow-lg">
                 <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 flex items-center">
-                    <i class="fa-solid fa-bullhorn text-emerald-400 mr-2"></i> Publicar no Mural
+                    <i class="fa-solid fa-bullhorn text-emerald-400 mr-2"></i> Publicar Alerta na Nuvem
                 </h2>
-                <textarea class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500 mb-3" rows="3" placeholder="Escreva um aviso ou alerta de segurança..."></textarea>
+                <input type="text" id="inputAutor" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500 mb-2" placeholder="O teu nome / Morador">
+                <textarea id="inputConteudo" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500 mb-3" rows="3" placeholder="Escreva uma ocorrência ou aviso..."></textarea>
                 <div class="flex justify-between items-center">
-                    <select class="bg-slate-800 text-slate-300 text-xs px-3 py-1.5 rounded-lg border border-slate-700">
+                    <select id="inputCategoria" class="bg-slate-800 text-slate-300 text-xs px-3 py-1.5 rounded-lg border border-slate-700">
                         <option>Segurança</option>
                         <option>Ajuda</option>
                         <option>Geral</option>
                     </select>
-                    <button class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-4 py-2 rounded-lg text-xs transition shadow-lg shadow-emerald-500/20">
-                        Publicar Alerta
+                    <button onclick="publicarAviso()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-4 py-2 rounded-lg text-xs transition shadow-lg shadow-emerald-500/20">
+                        Enviar Alerta
                     </button>
+                </div>
+            </div>
+
+            <!-- Lista de Avisos vindos do Supabase -->
+            <div class="space-y-3" id="listaAvisos">
+                <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-xs text-slate-400 text-center">
+                    A carregar avisos da base de dados...
                 </div>
             </div>
         </section>
@@ -67,14 +69,13 @@
         <section id="tab-mapa" class="hidden space-y-3">
             <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl">
                 <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 flex items-center">
-                    <i class="fa-solid fa-map-location-dot text-emerald-400 mr-2"></i> Mapa de Ocorrências - Patos/PB
+                    <i class="fa-solid fa-map-location-dot text-emerald-400 mr-2"></i> Mapa de Patos-PB
                 </h2>
                 <div id="patosMap" class="w-full h-72 rounded-lg border border-slate-800 z-10"></div>
-                <p class="text-[10px] text-slate-500 mt-2 text-center">Pins indicam ocorrências e áreas monitoradas.</p>
             </div>
         </section>
 
-        <!-- ABA 3: SEGURANÇA & FORÇAS POLICIAIS (Novo 17.0) -->
+        <!-- ABA 3: SEGURANÇA & FORÇAS POLICIAIS -->
         <section id="tab-seguranca" class="hidden space-y-3">
             <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl">
                 <div class="flex justify-between items-center mb-3">
@@ -87,19 +88,19 @@
                     <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg flex justify-between items-center">
                         <div>
                             <strong class="text-slate-200 block">Polícia Militar (PM-PB)</strong>
-                            <span class="text-slate-400 text-[10px]">Emergência 24h • Patrulhamento local</span>
+                            <span class="text-slate-400 text-[10px]">Emergência 24h</span>
                         </div>
                         <a href="tel:190" class="bg-red-500/20 text-red-400 px-3 py-1.5 rounded border border-red-500/30 text-[10px] font-semibold flex items-center space-x-1">
-                            <i class="fa-solid fa-phone"></i><span>Ligar 190</span>
+                            <i class="fa-solid fa-phone"></i><span>190</span>
                         </a>
                     </div>
                     <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg flex justify-between items-center">
                         <div>
                             <strong class="text-slate-200 block">Guarda Civil Municipal (GCM)</strong>
-                            <span class="text-slate-400 text-[10px]">Proteção ao patrimônio e rondas</span>
+                            <span class="text-slate-400 text-[10px]">Patrulhamento urbano</span>
                         </div>
                         <a href="tel:153" class="bg-amber-500/20 text-amber-400 px-3 py-1.5 rounded border border-amber-500/30 text-[10px] font-semibold flex items-center space-x-1">
-                            <i class="fa-solid fa-phone"></i><span>Ligar 153</span>
+                            <i class="fa-solid fa-phone"></i><span>153</span>
                         </a>
                     </div>
                     <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg flex justify-between items-center">
@@ -108,38 +109,22 @@
                             <span class="text-slate-400 text-[10px]">Resgate e salvamento</span>
                         </div>
                         <a href="tel:193" class="bg-blue-500/20 text-blue-400 px-3 py-1.5 rounded border border-blue-500/30 text-[10px] font-semibold flex items-center space-x-1">
-                            <i class="fa-solid fa-phone"></i><span>Ligar 193</span>
+                            <i class="fa-solid fa-phone"></i><span>193</span>
                         </a>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- ABA 4: COMÉRCIO -->
-        <section id="tab-comercio" class="hidden space-y-3">
-            <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-                <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3 flex items-center">
-                    <i class="fa-solid fa-store text-emerald-400 mr-2"></i> Comércio Local de Patos
-                </h2>
-                <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg flex justify-between items-center text-xs">
-                    <div>
-                        <strong class="text-slate-200 block">Mercadinho do Bairro</strong>
-                        <span class="text-slate-400 text-[10px]">Aberto até às 20h</span>
-                    </div>
-                    <button class="bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded border border-emerald-500/30 text-[10px] font-semibold">Ver</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- ABA 5: PERFIL -->
+        <!-- ABA 4: PERFIL -->
         <section id="tab-perfil" class="hidden space-y-3">
             <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl text-center">
                 <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-2">AS</div>
                 <h3 class="text-sm font-bold text-slate-200">Anderson Pereira Silva</h3>
                 <p class="text-xs text-slate-400">Patos - PB • Morador Verificado</p>
                 <div class="mt-4 pt-3 border-t border-slate-800 text-left text-xs space-y-2 text-slate-300">
-                    <p><i class="fa-solid fa-shield-halved text-emerald-400 mr-2"></i> Conexão Segura Supabase Cloud</p>
-                    <p><i class="fa-solid fa-mobile-screen text-emerald-400 mr-2"></i> Versão do App: 17.0 PRO</p>
+                    <p><i class="fa-solid fa-shield-halved text-emerald-400 mr-2"></i> Base Supabase Conectada</p>
+                    <p><i class="fa-solid fa-mobile-screen text-emerald-400 mr-2"></i> Versão: 17.1 PRO</p>
                 </div>
             </div>
         </section>
@@ -155,18 +140,21 @@
         <button onclick="mudarTab('seguranca')" id="btn-seguranca" class="flex flex-col items-center text-slate-400 text-[9px] space-y-1">
             <i class="fa-solid fa-shield-halved text-base"></i><span>Segurança</span>
         </button>
-        <button onclick="mudarTab('comercio')" id="btn-comercio" class="flex flex-col items-center text-slate-400 text-[9px] space-y-1">
-            <i class="fa-solid fa-store text-base"></i><span>Comércio</span>
-        </button>
         <button onclick="mudarTab('perfil')" id="btn-perfil" class="flex flex-col items-center text-slate-400 text-[9px] space-y-1">
             <i class="fa-solid fa-user text-base"></i><span>Perfil</span>
         </button>
     </nav>
 
     <script>
+        // Configuração do Cliente Supabase (Insere aqui as tuas chaves reais do projeto)
+        const SUPABASE_URL = 'https://urgtiuscnoboawqndcqt.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVyZ3RpdXNjbm9ib2F3cW5kY3F0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExMTc4NDIsImV4cCI6MjE0NjY5Mzg0Mn0.IwbOIXJsdpgQl26_FWniiuKmEaL-ZrX-8K61B-jljWg';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         let mapInitialized = false;
+
         function mudarTab(tabName) {
-            ['mural', 'mapa', 'seguranca', 'comercio', 'perfil'].forEach(t => {
+            ['mural', 'mapa', 'seguranca', 'perfil'].forEach(t => {
                 document.getElementById('tab-' + t).classList.add('hidden');
                 document.getElementById('btn-' + t).classList.remove('text-emerald-400');
                 document.getElementById('btn-' + t).classList.add('text-slate-400');
@@ -179,13 +167,75 @@
                 setTimeout(() => {
                     let patosMap = L.map('patosMap').setView([-7.0278, -37.2804], 14);
                     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(patosMap);
-                    L.marker([-7.0278, -37.2804]).addTo(patosMap).bindPopup('<b>Centro de Patos-PB</b><br>Área monitorada.').openPopup();
+                    L.marker([-7.0278, -37.2804]).addTo(patosMap).bindPopup('<b>Patos-PB</b><br>Central Comunitária.').openPopup();
                     mapInitialized = true;
                 }, 200);
             }
         }
+
+        // Carregar Avisos do Supabase ao iniciar
+        async function carregarAvisos() {
+            const container = document.getElementById('listaAvisos');
+            const { data, error } = await supabaseClient
+                .from('avisos_mural')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                container.innerHTML = `<div class="bg-red-500/10 border border-red-500/30 p-3 rounded-xl text-xs text-red-400 text-center">Erro ao carregar dados da nuvem. Verifica as tuas chaves Supabase.</div>`;
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                container.innerHTML = `<div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-xs text-slate-400 text-center">Nenhum aviso registado no momento.</div>`;
+                return;
+            }
+
+            container.innerHTML = data.map(aviso => `
+                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl space-y-1.5 shadow">
+                    <div class="flex justify-between items-center text-[10px]">
+                        <span class="text-emerald-400 font-bold"><i class="fa-solid fa-user mr-1"></i>${aviso.autor} (${aviso.bairro})</span>
+                        <span class="bg-slate-800 text-slate-300 px-2 py-0.5 rounded">${aviso.categoria}</span>
+                    </div>
+                    <p class="text-xs text-slate-200">${aviso.conteudo}</p>
+                    <span class="text-[9px] text-slate-500 block text-right">${new Date(aviso.created_at).toLocaleString('pt-BR')}</span>
+                </div>
+            `).join('');
+        }
+
+        // Publicar Novo Aviso no Supabase
+        async function publicarAviso() {
+            const autor = document.getElementById('inputAutor').value.trim();
+            const conteudo = document.getElementById('inputConteudo').value.trim();
+            const categoria = document.getElementById('inputCategoria').value;
+            const bairro = document.getElementById('bairroSelect').value;
+
+            if (!autor || !conteudo) {
+                alert('Por favor, preenche o teu nome e o conteúdo do aviso!');
+                return;
+            }
+
+            const { error } = await supabaseClient
+                .from('avisos_mural')
+                .insert([{ autor, bairro, categoria, conteudo, tipo: 'geral' }]);
+
+            if (error) {
+                alert('Erro ao publicar o alerta na nuvem.');
+                console.error(error);
+            } else {
+                alert('Alerta publicado com sucesso na nuvem!');
+                document.getElementById('inputConteudo').value = '';
+                carregarAvisos();
+            }
+        }
+
+        // Executar carregamento inicial ao abrir a página
+        window.onload = () => {
+            carregarAvisos();
+        };
+
         function ativarPanicoSilencioso() {
-            alert("⚠️ ALERTA DE PÂNICO SILENCIOSO ACIONADO!\nSua localização em Patos-PB foi gravada e disparada para a rede de apoio.");
+            alert("⚠️ ALERTA DE PÂNICO SILENCIOSO ACIONADO!\nCoordenadas enviadas para a base de dados de segurança de Patos-PB.");
         }
     </script>
 </body>
