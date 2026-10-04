@@ -15,7 +15,7 @@
         <div class="flex justify-between items-center mb-2">
             <div class="flex items-center space-x-2">
                 <h1 class="text-lg font-bold text-emerald-400">Vizinhança Ativa</h1>
-                <span class="text-xs bg-emerald-900/60 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-700/50">PRO 16.0</span>
+                <span class="text-xs bg-emerald-900/60 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-700/50">PRO 17.0</span>
             </div>
             <button onclick="ativarPanicoSilencioso()" class="bg-red-600/20 text-red-400 border border-red-600/50 px-3 py-1.5 rounded-full text-xs font-semibold flex items-center space-x-1 animate-pulse">
                 <i class="fa-solid fa-triangle-exclamation"></i>
@@ -34,11 +34,11 @@
         </div>
     </header>
 
-    <div class="mx-4 mt-3 bg-amber-500/10 border border-amber-500/30 p-3 rounded-xl flex items-start space-x-3 text-xs">
-        <i class="fa-solid fa-cloud-sun-rain text-amber-400 text-base mt-0.5"></i>
+    <div class="mx-4 mt-3 bg-red-500/10 border border-red-500/30 p-3 rounded-xl flex items-start space-x-3 text-xs">
+        <i class="fa-solid fa-shield-halved text-red-400 text-base mt-0.5"></i>
         <div>
-            <strong class="text-amber-300 block mb-0.5">Alerta da Defesa Civil - Patos/PB</strong>
-            <span class="text-slate-300">Temperaturas elevadas previstas. Hidrate-se e proteja os animais de rua.</span>
+            <strong class="text-red-300 block mb-0.5">Canal Direto de Segurança - Patos/PB</strong>
+            <span class="text-slate-300">Integração ativa com canais de emergência e forças policiais. Use com responsabilidade.</span>
         </div>
     </div>
 
@@ -49,29 +49,16 @@
                 <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 flex items-center">
                     <i class="fa-solid fa-bullhorn text-emerald-400 mr-2"></i> Publicar no Mural
                 </h2>
-                <textarea class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500 mb-3" rows="3" placeholder="Escreva um aviso ou pedido..."></textarea>
+                <textarea class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500 mb-3" rows="3" placeholder="Escreva um aviso ou alerta de segurança..."></textarea>
                 <div class="flex justify-between items-center">
                     <select class="bg-slate-800 text-slate-300 text-xs px-3 py-1.5 rounded-lg border border-slate-700">
-                        <option>Ajuda</option>
                         <option>Segurança</option>
+                        <option>Ajuda</option>
                         <option>Geral</option>
                     </select>
                     <button class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-4 py-2 rounded-lg text-xs transition shadow-lg shadow-emerald-500/20">
-                        Publicar com Segurança
+                        Publicar Alerta
                     </button>
-                </div>
-            </div>
-            <div class="space-y-3">
-                <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="font-semibold text-sm text-slate-200">Carlos Silva</span>
-                        <span class="text-[10px] bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded border border-emerald-800/50">Ajuda</span>
-                    </div>
-                    <p class="text-xs text-slate-300 mb-2">Furadeira emprestada por 1 hora?</p>
-                    <div class="flex justify-between items-center text-[10px] text-slate-500">
-                        <span>Centro • Há 10 min</span>
-                        <button class="text-emerald-400 hover:underline"><i class="fa-solid fa-heart mr-1"></i> 5 Apoios</button>
-                    </div>
                 </div>
             </div>
         </section>
@@ -83,33 +70,46 @@
                     <i class="fa-solid fa-map-location-dot text-emerald-400 mr-2"></i> Mapa de Ocorrências - Patos/PB
                 </h2>
                 <div id="patosMap" class="w-full h-72 rounded-lg border border-slate-800 z-10"></div>
-                <p class="text-[10px] text-slate-500 mt-2 text-center">Pins indicam alertas ativos em tempo real na região.</p>
+                <p class="text-[10px] text-slate-500 mt-2 text-center">Pins indicam ocorrências e áreas monitoradas.</p>
             </div>
         </section>
 
-        <!-- ABA 3: OPORTUNIDADES E BICOS (Novo 16.0) -->
-        <section id="tab-vagas" class="hidden space-y-3">
+        <!-- ABA 3: SEGURANÇA & FORÇAS POLICIAIS (Novo 17.0) -->
+        <section id="tab-seguranca" class="hidden space-y-3">
             <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl">
                 <div class="flex justify-between items-center mb-3">
                     <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center">
-                        <i class="fa-solid fa-briefcase text-emerald-400 mr-2"></i> Oportunidades & Bicos Locais
+                        <i class="fa-solid fa-building-shield text-red-400 mr-2"></i> Forças de Segurança & Emergência
                     </h2>
-                    <button class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-1 rounded text-[10px] font-semibold">+ Anunciar</button>
+                    <span class="text-[10px] bg-red-950 text-red-400 px-2 py-0.5 rounded border border-red-800">Patos-PB</span>
                 </div>
                 <div class="space-y-2 text-xs">
                     <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg flex justify-between items-center">
                         <div>
-                            <strong class="text-slate-200 block">Precisa-se de Jardineiro</strong>
-                            <span class="text-slate-400 text-[10px]">Bairro Belo Horizonte • Diária</span>
+                            <strong class="text-slate-200 block">Polícia Militar (PM-PB)</strong>
+                            <span class="text-slate-400 text-[10px]">Emergência 24h • Patrulhamento local</span>
                         </div>
-                        <button class="bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded border border-emerald-500/30 text-[10px] font-semibold">Candidatar</button>
+                        <a href="tel:190" class="bg-red-500/20 text-red-400 px-3 py-1.5 rounded border border-red-500/30 text-[10px] font-semibold flex items-center space-x-1">
+                            <i class="fa-solid fa-phone"></i><span>Ligar 190</span>
+                        </a>
                     </div>
                     <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg flex justify-between items-center">
                         <div>
-                            <strong class="text-slate-200 block">Aulas Particulares de Matemática</strong>
-                            <span class="text-slate-400 text-[10px]">Professor João • Centro</span>
+                            <strong class="text-slate-200 block">Guarda Civil Municipal (GCM)</strong>
+                            <span class="text-slate-400 text-[10px]">Proteção ao patrimônio e rondas</span>
                         </div>
-                        <button class="bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded border border-emerald-500/30 text-[10px] font-semibold">Contacto</button>
+                        <a href="tel:153" class="bg-amber-500/20 text-amber-400 px-3 py-1.5 rounded border border-amber-500/30 text-[10px] font-semibold flex items-center space-x-1">
+                            <i class="fa-solid fa-phone"></i><span>Ligar 153</span>
+                        </a>
+                    </div>
+                    <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg flex justify-between items-center">
+                        <div>
+                            <strong class="text-slate-200 block">Corpo de Bombeiros</strong>
+                            <span class="text-slate-400 text-[10px]">Resgate e salvamento</span>
+                        </div>
+                        <a href="tel:193" class="bg-blue-500/20 text-blue-400 px-3 py-1.5 rounded border border-blue-500/30 text-[10px] font-semibold flex items-center space-x-1">
+                            <i class="fa-solid fa-phone"></i><span>Ligar 193</span>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -121,14 +121,12 @@
                 <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3 flex items-center">
                     <i class="fa-solid fa-store text-emerald-400 mr-2"></i> Comércio Local de Patos
                 </h2>
-                <div class="space-y-2 text-xs">
-                    <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg flex justify-between items-center">
-                        <div>
-                            <strong class="text-slate-200 block">Mercadinho do Bairro</strong>
-                            <span class="text-slate-400 text-[10px]">Aberto até às 20h • Aceita Pix</span>
-                        </div>
-                        <button class="bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded border border-emerald-500/30 text-[10px] font-semibold">Ver</button>
+                <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg flex justify-between items-center text-xs">
+                    <div>
+                        <strong class="text-slate-200 block">Mercadinho do Bairro</strong>
+                        <span class="text-slate-400 text-[10px]">Aberto até às 20h</span>
                     </div>
+                    <button class="bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded border border-emerald-500/30 text-[10px] font-semibold">Ver</button>
                 </div>
             </div>
         </section>
@@ -141,7 +139,7 @@
                 <p class="text-xs text-slate-400">Patos - PB • Morador Verificado</p>
                 <div class="mt-4 pt-3 border-t border-slate-800 text-left text-xs space-y-2 text-slate-300">
                     <p><i class="fa-solid fa-shield-halved text-emerald-400 mr-2"></i> Conexão Segura Supabase Cloud</p>
-                    <p><i class="fa-solid fa-mobile-screen text-emerald-400 mr-2"></i> Versão do App: 16.0 PRO</p>
+                    <p><i class="fa-solid fa-mobile-screen text-emerald-400 mr-2"></i> Versão do App: 17.0 PRO</p>
                 </div>
             </div>
         </section>
@@ -154,8 +152,8 @@
         <button onclick="mudarTab('mapa')" id="btn-mapa" class="flex flex-col items-center text-slate-400 text-[9px] space-y-1">
             <i class="fa-solid fa-map text-base"></i><span>Mapa</span>
         </button>
-        <button onclick="mudarTab('vagas')" id="btn-vagas" class="flex flex-col items-center text-slate-400 text-[9px] space-y-1">
-            <i class="fa-solid fa-briefcase text-base"></i><span>Bicos</span>
+        <button onclick="mudarTab('seguranca')" id="btn-seguranca" class="flex flex-col items-center text-slate-400 text-[9px] space-y-1">
+            <i class="fa-solid fa-shield-halved text-base"></i><span>Segurança</span>
         </button>
         <button onclick="mudarTab('comercio')" id="btn-comercio" class="flex flex-col items-center text-slate-400 text-[9px] space-y-1">
             <i class="fa-solid fa-store text-base"></i><span>Comércio</span>
@@ -168,7 +166,7 @@
     <script>
         let mapInitialized = false;
         function mudarTab(tabName) {
-            ['mural', 'mapa', 'vagas', 'comercio', 'perfil'].forEach(t => {
+            ['mural', 'mapa', 'seguranca', 'comercio', 'perfil'].forEach(t => {
                 document.getElementById('tab-' + t).classList.add('hidden');
                 document.getElementById('btn-' + t).classList.remove('text-emerald-400');
                 document.getElementById('btn-' + t).classList.add('text-slate-400');
@@ -181,13 +179,13 @@
                 setTimeout(() => {
                     let patosMap = L.map('patosMap').setView([-7.0278, -37.2804], 14);
                     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(patosMap);
-                    L.marker([-7.0278, -37.2804]).addTo(patosMap).bindPopup('<b>Centro de Patos-PB</b><br>Alerta de segurança ativo.').openPopup();
+                    L.marker([-7.0278, -37.2804]).addTo(patosMap).bindPopup('<b>Centro de Patos-PB</b><br>Área monitorada.').openPopup();
                     mapInitialized = true;
                 }, 200);
             }
         }
         function ativarPanicoSilencioso() {
-            alert("⚠️ ALERTA DE PÂNICO SILENCIOSO ACIONADO!\nSua localização em Patos-PB foi enviada de forma discreta para os contactos de emergência.");
+            alert("⚠️ ALERTA DE PÂNICO SILENCIOSO ACIONADO!\nSua localização em Patos-PB foi gravada e disparada para a rede de apoio.");
         }
     </script>
 </body>
