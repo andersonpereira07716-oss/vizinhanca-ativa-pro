@@ -4,73 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vizinhança Ativa PRO - Dashboard Único</title>
+    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        :root {
-            --bg-color: #0b132b;
-            --card-bg: #1c2541;
-            --border-color: #3a506b;
-            --text-color: #fff;
-            --accent-color: #00f5d4;
-        }
-        body.light-theme {
-            --bg-color: #f1f5f9;
-            --card-bg: #ffffff;
-            --border-color: #cbd5e1;
-            --text-color: #1e293b;
-            --accent-color: #0284c7;
-        }
+        :root { --bg-color: #0b132b; --card-bg: #1c2541; --border-color: #3a506b; --text-color: #fff; --accent-color: #00f5d4; }
+        body.light-theme { --bg-color: #f1f5f9; --card-bg: #ffffff; --border-color: #cbd5e1; --text-color: #1e293b; --accent-color: #0284c7; }
         body { background-color: var(--bg-color); color: var(--text-color); font-family: Arial, sans-serif; margin: 0; padding: 12px; transition: background 0.3s, color 0.3s; }
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         h2 { font-size: 1.1rem; color: var(--accent-color); margin: 0; }
         .status-badge { font-size: 0.75rem; padding: 4px 10px; border-radius: 6px; font-weight: bold; background: #22c55e; color: white; display: inline-block; margin-bottom: 12px; }
         .theme-btn { background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
-        
-        /* Layout de Cartões Grandes na Mesma Página */
         .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
         .card.sos-border { border-left: 6px solid #ff4d4d; }
         .section-title { font-size: 1.05rem; font-weight: bold; color: var(--accent-color); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
-
-        /* Botões Grandes e Fáceis de Clicar */
-        .btn-sos { background-color: #ff4d4d; color: white; border: none; padding: 16px; width: 100%; font-size: 1.1rem; font-weight: bold; border-radius: 10px; cursor: pointer; margin-top: 12px; box-shadow: 0 4px 10px rgba(255, 77, 77, 0.4); }
+        .btn-sos { background-color: #ff4d4d; color: white; border: none; padding: 16px; width: 100%; font-size: 1.1rem; font-weight: bold; border-radius: 10px; cursor: pointer; margin-top: 12px; box-shadow: 0 4px 10px rgba(255, 77, 77, 0.4); transition: transform 0.1s; }
+        .btn-sos:active { transform: scale(0.97); }
         .btn-sec { background-color: #3b82f6; color: white; border: none; padding: 14px; width: 100%; font-size: 1rem; font-weight: bold; border-radius: 10px; cursor: pointer; margin-top: 10px; }
         .btn-mini { background-color: #3b82f6; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; cursor: pointer; margin-right: 6px; margin-top: 8px; }
         .btn-whatsapp { background-color: #22c55e; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-block; margin-top: 8px; }
-        
         input, select, textarea { width: 100%; padding: 12px; margin: 8px 0 14px 0; background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
         label { font-size: 0.9rem; font-weight: bold; opacity: 0.9; }
         .badge { background: #ff4d4d; color: white; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; }
         .gps-box { background: rgba(0, 245, 212, 0.1); border: 1px dashed var(--accent-color); padding: 12px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 12px; line-height: 1.4; }
-        
         #mapaCentral { width: 100%; height: 240px; border-radius: 8px; margin-bottom: 12px; border: 1px solid var(--border-color); }
         .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px; }
         .stat-card { background: var(--bg-color); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; text-align: center; }
         .stat-card h4 { margin: 0; font-size: 1.4rem; color: var(--accent-color); }
         .stat-card p { margin: 4px 0 0 0; font-size: 0.8rem; opacity: 0.8; }
-
         .contact-row { display: flex; justify-content: space-between; align-items: center; background: var(--bg-color); padding: 12px; border-radius: 8px; margin-bottom: 8px; border: 1px solid var(--border-color); }
         .contact-btn { background: #22c55e; color: #fff; padding: 10px 18px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.95rem; }
     </style>
 </head>
 <body>
-
     <div class="header-top">
         <h2>🛡️ Vizinhança Ativa PRO</h2>
         <button class="theme-btn" onclick="alternarTema()">🌙 Tema</button>
     </div>
-    <div><span id="networkStatus" class="status-badge">🟢 Sistema Online & GPS Ativo</span></div>
+    <div><span id="networkStatus" class="status-badge">🟢 PWA Seguro & GPS Ativo</span></div>
 
-    <!-- 1. BLOCO: DISPARAR ALERTA -->
     <div class="card sos-border">
         <div class="section-title">🚨 Disparar Emergência com GPS</div>
         <label>Morador:</label>
         <input type="text" id="nomeCliente" value="Anderson Pereira Silva">
         
-        <div class="gps-box" id="gpsInfoBox">
-            📍 <b>Estado GPS:</b> A obter coordenadas precisas em Patos-PB...<br>
-            Lat/Lon: A aguardar...
-        </div>
-        <button class="btn-sec" onclick="capturarGPS(true)" style="margin-top:0; margin-bottom:12px;">🔄 Atualizar Posição GPS Manualmente</button>
+        <div class="gps-box" id="gpsInfoBox">📍 <b>Estado GPS:</b> A obter coordenadas em Patos-PB...</div>
+        <button class="btn-sec" onclick="capturarGPS(true)" style="margin-top:0; margin-bottom:12px;">🔄 Atualizar Posição GPS</button>
 
         <label>Tipo de Emergência:</label>
         <select id="tipoAlerta">
@@ -83,18 +61,16 @@
         <label>Detalhes:</label>
         <textarea id="textoOcorrencia" rows="3" placeholder="Descreva o ocorrido..."></textarea>
 
-        <button class="btn-sos" onclick="enviarAlertaGPS()">🚨 DISPARAR ALERTA SUPREME</button>
+        <button class="btn-sos" id="btnSosPrincipal" onclick="confirmarEnvioSOS()">🚨 DISPARAR ALERTA SUPREME</button>
         <p id="statusEnvio" style="font-size: 0.9rem; color: #34d399; text-align: center; margin-top: 10px; font-weight: bold;"></p>
     </div>
 
-    <!-- 2. BLOCO: CENTRAL & MAPA COM RADAR -->
     <div class="card">
-        <div class="section-title">🖥️ Central de Ocorrências & Radar</div>
+        <div class="section-title">🖥️️ Central de Ocorrências & Radar</div>
         <div class="stats-grid">
             <div class="stat-card"><h4 id="statTotal">0</h4><p>Total Alertas</p></div>
             <div class="stat-card"><h4 id="statPanico">0</h4><p>SOS Pânico</p></div>
         </div>
-
         <div id="mapaCentral"></div>
         <div style="display: flex; gap: 8px; margin-bottom: 12px;">
             <button class="btn-sec" style="margin:0;" onclick="centrarNoUtilizador()">📍 Centrar em Mim</button>
@@ -109,7 +85,6 @@
         <div id="listaCentral">A carregar ocorrências...</div>
     </div>
 
-    <!-- 3. BLOCO: MURAL COMUNITÁRIO -->
     <div class="card">
         <div class="section-title">📢 Mural Comunitário</div>
         <textarea id="textoMural" rows="2" placeholder="Escreva um aviso para os vizinhos..."></textarea>
@@ -117,36 +92,26 @@
         <div id="listaMural" style="margin-top: 10px;">A carregar mural...</div>
     </div>
 
-    <!-- 4. BLOCO: MEUS ALERTAS -->
     <div class="card">
         <div class="section-title">📋 Alertas Disparados por Mim</div>
         <div id="listaHistorico">A carregar histórico...</div>
     </div>
 
-    <!-- 5. BLOCO: CONTACTOS DE EMERGÊNCIA -->
     <div class="card">
         <div class="section-title">📞 Telefones de Emergência Rápida</div>
-        <div class="contact-row">
-            <div><b>Polícia Militar</b><br><small>190</small></div>
-            <a href="tel:190" class="contact-btn">Ligar 190</a>
-        </div>
-        <div class="contact-row">
-            <div><b>Bombeiros</b><br><small>193</small></div>
-            <a href="tel:193" class="contact-btn">Ligar 193</a>
-        </div>
-        <div class="contact-row">
-            <div><b>SAMU</b><br><small>192</small></div>
-            <a href="tel:192" class="contact-btn">Ligar 192</a>
-        </div>
+        <div class="contact-row"><div><b>Polícia Militar</b><br><small>190</small></div><a href="tel:190" class="contact-btn">Ligar 190</a></div>
+        <div class="contact-row"><div><b>Bombeiros</b><br><small>193</small></div><a href="tel:193" class="contact-btn">Ligar 193</a></div>
+        <div class="contact-row"><div><b>SAMU</b><br><small>192</small></div><a href="tel:192" class="contact-btn">Ligar 192</a></div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         const SUPABASE_URL = 'https://urgtiuscnoboawqndcqt.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVyZ3RpdXNjbm9ib2F3cW5kY3F0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExMTc4NDIsImV4cCI6MjEwNjY5Mzg0Mn0.IwbOIXJsdpgQl26_FWniiuKmEaL-ZrX-8K61B-jljWg';
-        let map, markersLayer, ultimoIdConhecido = 0;
+        let map, markersLayer, ultimoIdConhecido = 0, cliquePendente = false;
         let minhaLat = -7.0158, minhaLon = -37.2801;
 
+        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.io.js'); }
         if (Notification.permission !== "granted") { Notification.requestPermission(); }
 
         window.onload = function() {
@@ -155,15 +120,10 @@
             carregarMural();
             carregarHistorico();
             setTimeout(initMapa, 400);
-            // Atualizar automaticamente a cada 10 segundos
-            setInterval(() => {
-                carregarCentral();
-                carregarMural();
-            }, 10000);
+            setInterval(() => { carregarCentral(); carregarMural(); }, 10000);
         };
 
         function alternarTema() { document.body.classList.toggle('light-theme'); }
-
         function initMapa() {
             if(map) return;
             map = L.map('mapaCentral').setView([minhaLat, minhaLon], 14);
@@ -171,52 +131,49 @@
             markersLayer = L.layerGroup().addTo(map);
             carregarCentral();
         }
-
-        function centrarNoUtilizador() {
-            if(map) {
-                map.setView([minhaLat, minhaLon], 15);
-                alert("📍 Mapa centrado na sua posição GPS!");
-            }
-        }
-
+        function centrarNoUtilizador() { if(map) map.setView([minhaLat, minhaLon], 15); }
         function capturarGPS(comAlerta) {
             const box = document.getElementById('gpsInfoBox');
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     pos => {
-                        minhaLat = pos.coords.latitude;
-                        minhaLon = pos.coords.longitude;
-                        const precisoes = pos.coords.accuracy ? Math.round(pos.coords.accuracy) : 'N/D';
-                        box.innerHTML = `✅ <b>GPS Ativo & Sincronizado</b><br>Lat: ${minhaLat.toFixed(5)}, Lon: ${minhaLon.toFixed(5)} <br><small>Precisão: ~${precisoes} metros</small>`;
-                        if(comAlerta) alert("✅ Posição GPS atualizada com sucesso!");
-                        if(map) {
-                            map.setView([minhaLat, minhaLon], 15);
-                            carregarCentral();
-                        }
+                        minhaLat = pos.coords.latitude; minhaLon = pos.coords.longitude;
+                        box.innerHTML = `✅ <b>GPS Ativo & Sincronizado</b><br>Lat: ${minhaLat.toFixed(5)}, Lon: ${minhaLon.toFixed(5)}`;
+                        if(comAlerta) alert("✅ Posição GPS atualizada!");
+                        if(map) { map.setView([minhaLat, minhaLon], 15); carregarCentral(); }
                     },
-                    err => {
-                        box.innerHTML = `⚠️ <b>GPS Indisponível</b> (A usar Patos-PB predefinido)<br>Erro: ${err.message}`;
-                        if(comAlerta) alert("❌ Não foi possível obter o sinal GPS. Verifique as permissões.");
-                    },
+                    err => { box.innerHTML = `⚠️ <b>GPS Indisponível</b> (A usar Patos-PB)`; },
                     { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                 );
-            } else {
-                box.innerHTML = `❌ Geolocalização não suportada pelo navegador.`;
             }
         }
-
+        function confirmarEnvioSOS() {
+            const btn = document.getElementById('btnSosPrincipal');
+            if (!cliquePendente) {
+                cliquePendente = true;
+                btn.style.backgroundColor = "#eab308";
+                btn.innerText = "⚠️ CONFIRMAR TOQUE (CLIQUE DE NOVO)";
+                setTimeout(() => {
+                    cliquePendente = false;
+                    btn.style.backgroundColor = "#ff4d4d";
+                    btn.innerText = "🚨 DISPARAR ALERTA SUPREME";
+                }, 4000);
+                return;
+            }
+            cliquePendente = false;
+            btn.style.backgroundColor = "#ff4d4d";
+            btn.innerText = "🚨 DISPARAR ALERTA SUPREME";
+            enviarAlertaGPS();
+        }
         function enviarAlertaGPS() {
             const nome = document.getElementById('nomeCliente').value;
             const tipo = document.getElementById('tipoAlerta').value;
             const texto = document.getElementById('textoOcorrencia').value;
             const status = document.getElementById('statusEnvio');
-
-            status.innerText = "A enviar alerta com coordenadas GPS...";
+            status.innerText = "A enviar alerta com GPS...";
             if("vibrate" in navigator) navigator.vibrate([200, 100, 200]);
-
             executarEnvioSupabase(tipo, `${tipo} - ${nome}: ${texto}`, minhaLat, minhaLon);
         }
-
         async function executarEnvioSupabase(tipo, bairro, lat, lon) {
             const status = document.getElementById('statusEnvio');
             try {
@@ -226,32 +183,23 @@
                     body: JSON.stringify({ tipo: tipo, bairro: bairro, latitude: lat, longitude: lon, urgente: true })
                 });
                 if(res.ok) {
-                    status.innerText = "✅ Alerta com GPS enviado com sucesso!";
+                    status.innerText = "✅ Alerta enviado com segurança!";
                     let meusAlertas = JSON.parse(localStorage.getItem('meus_alertas') || '[]');
                     meusAlertas.unshift({ tipo, bairro, data: new Date().toLocaleString() });
                     localStorage.setItem('meus_alertas', JSON.stringify(meusAlertas));
-                    carregarCentral();
-                    carregarHistorico();
+                    carregarCentral(); carregarHistorico();
                     document.getElementById('textoOcorrencia').value = '';
                 } else { status.innerText = "❌ Erro ao enviar."; }
-            } catch(e) {
-                status.innerText = "❌ Falha de rede.";
-            }
+            } catch(e) { status.innerText = "❌ Falha de rede."; }
         }
-
         function calcularDistancia(lat1, lon1, lat2, lon2) {
             const R = 6371;
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                      Math.sin(dLon/2) * Math.sin(dLon/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            const d = R * c;
-            if(d < 1) return Math.round(d * 1000) + " m de si";
-            return d.toFixed(1) + " km de si";
+            const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+            const d = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return d < 1 ? Math.round(d * 1000) + " m de si" : d.toFixed(1) + " km de si";
         }
-
         async function carregarCentral() {
             try {
                 const res = await fetch(`${SUPABASE_URL}/rest/v1/ocorrencias?select=*&order=id.desc&limit=20`, {
@@ -259,100 +207,51 @@
                 });
                 if(res.ok) {
                     const dados = await res.json();
-                    
-                    if(dados.length > 0 && dados[0].id > ultimoIdConhecido) {
-                        if(ultimoIdConhecido !== 0 && Notification.permission === "granted") {
-                            new Notification("🚨 NOVO SOS EM PATOS-PB!", { body: dados[0].bairro });
-                        }
-                        ultimoIdConhecido = dados[0].id;
-                    }
-
                     document.getElementById('statTotal').innerText = dados.length;
                     document.getElementById('statPanico').innerText = dados.filter(i => i.tipo === 'SOS Pânico').length;
-
                     const filtro = document.getElementById('filtroTipo').value;
                     const container = document.getElementById('listaCentral');
                     let html = '';
                     if(markersLayer) markersLayer.clearLayers();
-
-                    if(map) {
-                        L.marker([minhaLat, minhaLon], {
-                            icon: L.divIcon({ className: 'custom-user-pin', html: '📍', iconSize: [22, 22] })
-                        }).addTo(markersLayer).bindPopup("<b>A sua posição atual</b>");
-                    }
-
+                    if(map) L.marker([minhaLat, minhaLon], { icon: L.divIcon({ className: '', html: '📍', iconSize: [22, 22] }) }).addTo(markersLayer);
                     dados.forEach(item => {
                         if(map && item.latitude && item.longitude && (filtro === 'TODOS' || item.tipo === filtro)) {
                             L.marker([item.latitude, item.longitude]).addTo(markersLayer).bindPopup(`<b>${item.tipo}</b><br>${item.bairro}`);
                         }
-
                         if(filtro === 'TODOS' || item.tipo === filtro) {
-                            let distanciaTexto = "";
-                            if(item.latitude && item.longitude) {
-                                const distStr = calcularDistancia(minhaLat, minhaLon, item.latitude, item.longitude);
-                                distanciaTexto = `<span style="font-size:0.8rem; color:var(--accent-color); display:block; margin-top:4px; font-weight:bold;">📍 Distância: ${distStr}</span>`;
-                            }
-
-                            const relatorioTxt = `[RELATÓRIO VIZINHANÇA ATIVA]\nTipo: ${item.tipo}\nDetalhes: ${item.bairro}`;
-                            const txtWhatsApp = encodeURIComponent(`🚨 *ALERTA VIZINHANÇA ATIVA* 🚨\n${item.bairro}`);
-                            html += `
-                                <div class="card sos-border" style="margin-bottom:10px; padding:12px;">
-                                    <span class="badge">${item.tipo || 'SOS'}</span>
-                                    <p style="margin:8px 0; font-size:0.95rem;"><b>Info:</b> ${item.bairro}</p>
-                                    ${distanciaTexto}
-                                    <div style="margin-top:8px;">
-                                        <button class="btn-mini" onclick="copiarRelatorio('${relatorioTxt}')">📋 Copiar</button>
-                                        <a class="btn-whatsapp" href="https://api.whatsapp.com/send?text=${txtWhatsApp}" target="_blank">📤 WhatsApp</a>
-                                    </div>
-                                </div>
-                            `;
+                            let dist = item.latitude && item.longitude ? `<span style="font-size:0.8rem; color:var(--accent-color); display:block; margin-top:4px; font-weight:bold;">📍 Distância: ${calcularDistancia(minhaLat, minhaLon, item.latitude, item.longitude)}</span>` : '';
+                            let txtWp = encodeURIComponent(`🚨 *ALERTA VIZINHANÇA* 🚨\n${item.bairro}`);
+                            html += `<div class="card sos-border" style="margin-bottom:10px; padding:12px;"><span class="badge">${item.tipo || 'SOS'}</span><p style="margin:8px 0; font-size:0.95rem;"><b>Info:</b> ${item.bairro}</p>${dist}<div style="margin-top:8px;"><button class="btn-mini" onclick="navigator.clipboard.writeText('${item.bairro}'); alert('Copiado!');">📋 Copiar</button><a class="btn-whatsapp" href="https://api.whatsapp.com/send?text=${txtWp}" target="_blank">📤 WhatsApp</a></div></div>`;
                         }
                     });
-                    container.innerHTML = html || '<p>Nenhum alerta encontrado.</p>';
+                    container.innerHTML = html || '<p>Nenhum alerta.</p>';
                 }
             } catch(e){}
         }
-
-        function copiarRelatorio(texto) {
-            navigator.clipboard.writeText(texto);
-            alert("📋 Relatório copiado para a área de transferência!");
-        }
-
         function carregarHistorico() {
-            const meusAlertas = JSON.parse(localStorage.getItem('meus_alertas') || '[]');
-            const container = document.getElementById('listaHistorico');
-            if(meusAlertas.length === 0) { container.innerHTML = '<p>Ainda não disparou nenhum alerta nesta sessão.</p>'; return; }
+            const meus = JSON.parse(localStorage.getItem('meus_alertas') || '[]');
             let html = '';
-            meusAlertas.forEach(item => {
-                html += `<div class="card" style="margin-bottom:8px; padding:10px;"><span class="badge">${item.tipo}</span><p style="margin:6px 0;">${item.bairro}</p><small style="opacity:0.7;">Disparado em: ${item.data}</small></div>`;
-            });
-            container.innerHTML = html;
+            meus.forEach(i => html += `<div class="card" style="margin-bottom:8px; padding:10px;"><span class="badge">${i.tipo}</span><p style="margin:6px 0;">${i.bairro}</p><small style="opacity:0.7;">${i.data}</small></div>`);
+            document.getElementById('listaHistorico').innerHTML = html || '<p>Nenhum alerta disparado.</p>';
         }
-
         async function publicarMural() {
             const texto = document.getElementById('textoMural').value;
-            if(!texto) return alert('Escreva um aviso para publicar.');
+            if(!texto) return alert('Escreva algo.');
             await fetch(`${SUPABASE_URL}/rest/v1/ocorrencias`, {
                 method: 'POST',
                 headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ tipo: 'Mural', bairro: 'Aviso: ' + texto, latitude: minhaLat, longitude: minhaLon, urgente: false })
             });
             document.getElementById('textoMural').value = '';
-            alert('Aviso publicado no Mural com sucesso!');
             carregarMural();
         }
-
         async function carregarMural() {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/ocorrencias?select=*&order=id.desc&limit=10`, {
-                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-            });
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/ocorrencias?select=*&order=id.desc&limit=10`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
             if(res.ok) {
                 const dados = await res.json();
                 let html = '';
-                dados.forEach(item => {
-                    if(item.tipo === 'Mural') html += `<div class="card" style="margin-bottom:8px; padding:10px;"><p style="margin:0;">${item.bairro}</p></div>`;
-                });
-                document.getElementById('listaMural').innerHTML = html || '<p>Sem avisos recentes no mural.</p>';
+                dados.forEach(item => { if(item.tipo === 'Mural') html += `<div class="card" style="margin-bottom:8px; padding:10px;"><p style="margin:0;">${item.bairro}</p></div>`; });
+                document.getElementById('listaMural').innerHTML = html || '<p>Sem avisos.</p>';
             }
         }
     </script>
