@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central Operacional - Vizinhança Ativa PRO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+
+    <header class="bg-slate-900 border-b border-slate-800 p-4 flex justify-between items-center shadow-lg">
+        <div class="flex items-center space-x-3">
+            <span class="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></span>
+            <h1 class="text-xl font-bold tracking-wide">CENTRAL DE MONITORAMENTO — PATOS-PB</h1>
+        </div>
+        <div id="status-conexao" class="text-xs bg-slate-800 px-3 py-1.5 rounded-full text-slate-300 border border-slate-700">
+            Aguardando Alertas...
+        </div>
+    </header>
+
+    <main class="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-4 p-4">
+        <section class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col h-[600px]">
+            <h2 class="text-lg font-semibold text-rose-400 mb-3 flex items-center gap-2">
+                🚨 SOS Pânico Ativos
+            </h2>
+            <div id="lista-sos" class="flex-1 overflow-y-auto space-y-3 pr-1">
+                <div class="bg-slate-800/50 border border-slate-700/50 p-3 rounded-lg text-sm text-slate-400 text-center py-20">
+                    A carregar ocorrências da nuvem...
+                </div>
+            </div>
+        </section>
+
+        <section class="lg:col-span-2 bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col h-[600px]">
+            <h2 class="text-lg font-semibold text-sky-400 mb-3">📍 Mapa de Incidentes em Patos-PB</h2>
+            <div id="map" class="flex-1 rounded-lg border border-slate-800 overflow-hidden z-10"></div>
+        </section>
+    </main>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const map = L.map('map').setView([-7.0158, -37.2801], 14);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        const SUPABASE_URL = 'https://urgtiuscnoboawqndcqt.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVyZ3RpdXNjbm9ib2F3cW5kY3F0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExMTc4NDIsImV4cCI6MjEwNjY5Mzg0Mn0.IwbOIXJsdpgQl26_FWniiuKmEaL-ZrX-8K61B-jljWg';
+
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const statusConexao = document.getElementById('status-conexao');
+        const listaSos = document.getElementById('lista-sos');
+        let marcadoresAtivos = [];
+
+        statusConexao.textContent = "Sistema Online (Sincronizado)";
+        statusConexao.className = "text-xs bg-emerald-950 px-3 py-1.5 rounded-full text-emerald-300 border border-emerald-700";
+
+        function adicionarAlertaNaCentral(dados, prepend = true) {
+            if (listaSos.innerHTML.includes("A carregar ocorrências") || listaSos.innerHTML.includes("Nenhum alerta de emergência")) {
+                listaSos.innerHTML = "";
+            }
+
+            const horaFormatada = new Date(dados.created_at || Date.now()).toLocaleTimeString('pt-BR');
+
+            const card = document.createElement('div');
+            card.className = "bg-rose-950/40 border border-rose-800/60 p-3 rounded-lg text-sm text-slate-200";
+            card.innerHTML = `
+                <div class="flex justify-between font-bold text-rose-400 mb-1">
+                    <span>🚨 SOS PÂNICO</span>
+                    <span class="text-xs text-slate-400">${horaFormatada}</span>
+                </div>
+                <p><b>Local/Bairro:</b> ${dados.bairro || 'Patos-PB'}</p>
+                <p class="text-xs text-slate-300 mt-1">Coordenadas: ${dados.latitude}, ${dados.longitude}</p>
+            `;
+            
+            if (prepend) {
+                listaSos.prepend(card);
+            } else {
+                listaSos.appendChild(card);
+            }
+
+            // Adicionar marcador no mapa
+            if (dados.latitude && dados.longitude) {
+                const marker = L.marker([dados.latitude, dados.longitude]).addTo(map)
+                    .bindPopup(`<b>SOS PÂNICO!</b><br>Bairro: ${dados.bairro || 'Patos-PB'}`);
+                marcadoresAtivos.push(marker);
+            }
+        }
+
+        // 1. Carregar dados existentes na tabela ao abrir a página
+        async function carregarAlertasExistentes() {
+            const { data, error } = await supabaseClient
+                .from('ocorrencias')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(20);
+
+            if (error) {
+                console.error('Erro ao buscar ocorrências:', error);
+                listaSos.innerHTML = `<div class="text-rose-500 text-center p-4">Erro ao carregar dados da base.</div>`;
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                listaSos.innerHTML = `<div class="bg-slate-800/50 border border-slate-700/50 p-3 rounded-lg text-sm text-slate-400 text-center py-20">Nenhum alerta de emergência registado.</div>`;
+                return;
+            }
+
+            listaSos.innerHTML = "";
+            // Filtrar apenas os que são SOS ou urgentes
+            const sosAlertas = data.filter(item => item.tipo === 'sos' || item.urgente);
+            
+            if (sosAlertas.length === 0) {
+                listaSos.innerHTML = `<div class="bg-slate-800/50 border border-slate-700/50 p-3 rounded-lg text-sm text-slate-400 text-center py-20">Nenhum alerta de pânico no momento.</div>`;
+                return;
+            }
+
+            sosAlertas.forEach(item => adicionarAlertaNaCentral(item, false));
+            
+            // Focar o mapa no último alerta se existir
+            if (sosAlertas[0].latitude && sosAlertas[0].longitude) {
+                map.setView([sosAlertas[0].latitude, sosAlertas[0].longitude], 14);
+            }
+        }
+
+        carregarAlertasExistentes();
+
+        // 2. Escutar novos alertas em tempo real
+        supabaseClient
+            .channel('central-operacional-realtime')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'ocorrencias' }, payload => {
+                console.log('Novo registo em tempo real:', payload.new);
+                if (payload.new.tipo === 'sos' || payload.new.urgente) {
+                    adicionarAlertaNaCentral(payload.new, true);
+                    map.setView([payload.new.latitude, payload.new.longitude], 15);
+
+                    if ('speechSynthesis' in window) {
+                        const utterance = new SpeechSynthesisUtterance("Alerta de pânico recebido!");
+                        utterance.lang = 'pt-BR';
+                        window.speechSynthesis.speak(utterance);
+                    }
+                }
+            })
+            .subscribe((status) => {
+                console.log("Estado da subscrição Realtime:", status);
+            });
+    </script>
+</body>
+</html>

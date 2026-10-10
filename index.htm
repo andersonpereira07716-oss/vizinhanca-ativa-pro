@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="pt-PT" class="h-full dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Vizinhança Segura - Patos/PB</title>
+  
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#4f46e5" />
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode: 'class' }
+  </script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+    #mapa-container { height: 220px; width: 100%; border-radius: 1rem; z-index: 1; }
+  </style>
+</head>
+
+<body id="corpo-app" class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased transition-colors duration-300">
+
+  <div class="flex flex-col min-h-screen max-w-md mx-auto w-full bg-slate-900 border-x border-slate-800 shadow-2xl relative pb-20">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-600/30 font-bold">
+          <i data-lucide="shield-check" class="w-4 h-4"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <h1 class="text-xs font-bold text-slate-900 dark:text-white leading-tight">Vizinhança Segura</h1>
+            <span id="status-conexao" class="w-2 h-2 rounded-full bg-emerald-500" title="Online"></span>
+          </div>
+          <p class="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-0.5 font-medium">
+            <i data-lucide="map-pin" class="w-3 h-3 text-indigo-500"></i> Patos - PB
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-1.5">
+        <button onclick="acionarSOS()" class="px-2.5 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-500 dark:text-rose-400 text-[11px] font-bold flex items-center gap-1 active:scale-95 transition-transform">
+          <i data-lucide="alert-octagon" class="w-3.5 h-3.5"></i> SOS
+        </button>
+        <button onclick="alternarTema()" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700/50 flex items-center justify-center text-slate-600 dark:text-slate-300 active:scale-95 transition-transform">
+          <i data-lucide="moon" id="icone-tema" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="flex-1 p-4 space-y-5">
+
+      <!-- ABA INÍCIO -->
+      <div id="tab-inicio" class="space-y-5">
+        <section class="rounded-3xl bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-800 p-5 text-white shadow-xl shadow-indigo-950/40 relative overflow-hidden">
+          <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-semibold uppercase bg-white/15 text-indigo-100 border border-white/10 mb-2.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Central Patos
+          </span>
+          <h2 class="text-lg font-bold leading-snug">Monitoramento comunitário de Patos</h2>
+          <p class="text-[11px] text-indigo-100/80 mt-1 leading-relaxed">Conecte-se com vizinhos e receba avisos em tempo real.</p>
+        </section>
+
+        <!-- Botões Rápidos -->
+        <section class="grid grid-cols-3 gap-2">
+          <button onclick="abrirModalAlerta()" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 shadow-sm active:scale-95 transition-transform text-center">
+            <i data-lucide="alert-triangle" class="w-5 h-5 text-indigo-500 mb-1"></i>
+            <span class="text-[11px] font-bold text-slate-900 dark:text-slate-100">Alerta</span>
+          </button>
+          <button onclick="mudarAba('mapa')" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 shadow-sm active:scale-95 transition-transform text-center">
+            <i data-lucide="map" class="w-5 h-5 text-violet-500 mb-1"></i>
+            <span class="text-[11px] font-bold text-slate-900 dark:text-slate-100">Mapa</span>
+          </button>
+          <button onclick="mudarAba('achados')" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 shadow-sm active:scale-95 transition-transform text-center">
+            <i data-lucide="search" class="w-5 h-5 text-amber-500 mb-1"></i>
+            <span class="text-[11px] font-bold text-slate-900 dark:text-slate-100">Achados</span>
+          </button>
+        </section>
+
+        <!-- Feed de Alertas -->
+        <section class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Atividade Recente</h3>
+            <span onclick="carregarAlertas()" class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 cursor-pointer">Atualizar</span>
+          </div>
+
+          <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-[11px]">
+            <button onclick="filtrarFeed('Todos')" id="filter-Todos" class="px-3 py-1 rounded-full bg-indigo-600 text-white font-semibold">Todos</button>
+            <button onclick="filtrarFeed('Segurança')" id="filter-Segurança" class="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-medium">Segurança</button>
+            <button onclick="filtrarFeed('Informativo')" id="filter-Informativo" class="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-medium">Informativo</button>
+          </div>
+
+          <div id="feed-alertas" class="space-y-2.5">
+            <!-- Conteúdo Dinâmico -->
+          </div>
+        </section>
+      </div>
+
+      <!-- ABA MAPA -->
+      <div id="tab-mapa" class="hidden space-y-4">
+        <div>
+          <h2 class="text-sm font-bold text-slate-900 dark:text-white">Mapa Interativo de Ocorrências</h2>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Patos/PB - Monitoramento ao vivo:</p>
+        </div>
+
+        <div id="mapa-container"></div>
+
+        <div class="relative">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-3"></i>
+          <input id="filtro-bairro" type="text" oninput="filtrarBairros()" placeholder="Pesquisar bairro..." class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500 shadow-sm" />
+        </div>
+
+        <div id="lista-bairros" class="space-y-2">
+          <div class="bairro-item p-3 bg-white dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700/60 shadow-sm text-xs flex justify-between items-center" data-nome="centro">
+            <div>
+              <span class="font-bold block text-slate-900 dark:text-slate-200">Centro</span>
+              <span class="text-[10px] text-slate-500 dark:text-slate-400">Patrulhamento ativo</span>
+            </div>
+            <span class="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold text-[10px]">Normal</span>
+          </div>
+          <div class="bairro-item p-3 bg-white dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700/60 shadow-sm text-xs flex justify-between items-center" data-nome="jardim brasilia">
+            <div>
+              <span class="font-bold block text-slate-900 dark:text-slate-200">Jardim Brasília</span>
+              <span class="text-[10px] text-slate-500 dark:text-slate-400">Manutenção elétrica</span>
+            </div>
+            <span class="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-semibold text-[10px]">Atenção</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ABA ACHADOS E PERDIDOS -->
+      <div id="tab-achados" class="hidden space-y-4">
+        <div class="flex justify-between items-center">
+          <div>
+            <h2 class="text-sm font-bold text-slate-900 dark:text-white">Achados e Perdidos</h2>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400">Ajude vizinhos a reencontrar pertences:</p>
+          </div>
+          <button onclick="abrirModalAchados()" class="px-3 py-1.5 rounded-xl bg-amber-500 text-white font-bold text-xs shadow-md">
+            + Publicar
+          </button>
+        </div>
+
+        <div id="feed-achados" class="space-y-2.5">
+          <!-- Inserido via JS -->
+        </div>
+      </div>
+
+      <!-- ABA PERFIL -->
+      <div id="tab-perfil" class="hidden space-y-4 py-2">
+        <div class="text-center space-y-2">
+          <div class="w-16 h-16 bg-indigo-600 rounded-full mx-auto flex items-center justify-center text-xl font-bold text-white shadow-lg">AS</div>
+          <h2 class="text-sm font-bold text-slate-900 dark:text-white">Anderson Pereira Silva</h2>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400">Patos - Paraíba</p>
+        </div>
+
+        <div class="p-3.5 bg-white dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700/60 shadow-sm space-y-2">
+          <p class="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+            <i data-lucide="phone-call" class="w-3.5 h-3.5 text-rose-500"></i> Contactos Úteis em Patos
+          </p>
+          <div class="grid grid-cols-2 gap-2 text-[11px]">
+            <a href="tel:190" class="p-2 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+              <span class="font-semibold text-slate-700 dark:text-slate-300">Polícia Militar</span>
+              <span class="font-bold text-indigo-500">190</span>
+            </a>
+            <a href="tel:192" class="p-2 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+              <span class="font-semibold text-slate-700 dark:text-slate-300">SAMU</span>
+              <span class="font-bold text-rose-500">192</span>
+            </a>
+            <a href="tel:193" class="p-2 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+              <span class="font-semibold text-slate-700 dark:text-slate-300">Bombeiros</span>
+              <span class="font-bold text-amber-500">193</span>
+            </a>
+            <a href="tel:153" class="p-2 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+              <span class="font-semibold text-slate-700 dark:text-slate-300">Guarda Municipal</span>
+              <span class="font-bold text-emerald-500">153</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Modal Novo Alerta -->
+    <div id="modal-alerta" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-4">
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-sm rounded-3xl p-5 space-y-4 shadow-2xl">
+        <div class="flex justify-between items-center">
+          <h3 class="text-sm font-bold text-slate-900 dark:text-white">Novo Alerta Comunitário</h3>
+          <button onclick="fecharModalAlerta()" class="text-slate-400 hover:text-slate-600 text-sm font-bold">✕</button>
+        </div>
+        <div class="space-y-3">
+          <div>
+            <label class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block mb-1">Bairro / Localidade</label>
+            <input id="input-bairro" type="text" placeholder="Ex: Centro, Jardim Brasília..." class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500" />
+          </div>
+          <div>
+            <label class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block mb-1">Descrição</label>
+            <textarea id="input-descricao" rows="2" placeholder="Descreva a ocorrência..." class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500"></textarea>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <button onclick="salvarAlerta('Informativo')" class="py-2.5 px-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 rounded-xl text-xs font-semibold text-emerald-600 dark:text-emerald-400">📢 Informar</button>
+          <button onclick="salvarAlerta('Segurança')" class="py-2.5 px-3 bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-300">🚨 Segurança</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Achados & Perdidos -->
+    <div id="modal-achados" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-4">
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-sm rounded-3xl p-5 space-y-4 shadow-2xl">
+        <div class="flex justify-between items-center">
+          <h3 class="text-sm font-bold text-slate-900 dark:text-white">Publicar Achado/Perdido</h3>
+          <button onclick="fecharModalAchados()" class="text-slate-400 hover:text-slate-600 text-sm font-bold">✕</button>
+        </div>
+        <div class="space-y-3">
+          <input id="input-item-titulo" type="text" placeholder="Ex: Chaves no Centro" class="w-full bg-slate-100 dark:bg-slate-800 border rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white" />
+          <textarea id="input-item-desc" rows="2" placeholder="Detalhes e contacto..." class="w-full bg-slate-100 dark:bg-slate-800 border rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white"></textarea>
+        </div>
+        <button onclick="salvarAchado()" class="w-full py-2.5 px-3 bg-amber-500 text-white font-bold rounded-xl text-xs">Publicar Anúncio</button>
+      </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/90 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-6 py-3 flex justify-between items-center z-40">
+      <button onclick="mudarAba('inicio')" id="btn-inicio" class="flex flex-col items-center gap-1 text-indigo-600 dark:text-indigo-400 font-bold text-[10px]">
+        <i data-lucide="home" class="w-5 h-5"></i><span>Início</span>
+      </button>
+      <button onclick="mudarAba('mapa')" id="btn-mapa" class="flex flex-col items-center gap-1 text-slate-400 font-medium text-[10px]">
+        <i data-lucide="map" class="w-5 h-5"></i><span>Mapa</span>
+      </button>
+      <button onclick="mudarAba('achados')" id="btn-achados" class="flex flex-col items-center gap-1 text-slate-400 font-medium text-[10px]">
+        <i data-lucide="search" class="w-5 h-5"></i><span>Achados</span>
+      </button>
+      <button onclick="mudarAba('perfil')" id="btn-perfil" class="flex flex-col items-center gap-1 text-slate-400 font-medium text-[10px]">
+        <i data-lucide="user" class="w-5 h-5"></i><span>Perfil</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <script>
+    let filtroAtual = 'Todos';
+    let mapaInicializado = false;
+
+    function renderIcons() {
+      if (window.lucide) { lucide.createIcons(); }
+    }
+
+    function mudarAba(aba) {
+      ['inicio', 'mapa', 'achados', 'perfil'].forEach(a => {
+        document.getElementById('tab-' + a).classList.add('hidden');
+        const btn = document.getElementById('btn-' + a);
+        if (btn) btn.className = "flex flex-col items-center gap-1 text-slate-400 font-medium text-[10px]";
+      });
+
+      document.getElementById('tab-' + aba).classList.remove('hidden');
+      document.getElementById('btn-' + aba).className = "flex flex-col items-center gap-1 text-indigo-600 dark:text-indigo-400 font-bold text-[10px]";
+
+      if (aba === 'mapa' && !mapaInicializado) {
+        setTimeout(initMapa, 200);
+      }
+      renderIcons();
+    }
+
+    function initMapa() {
+      mapaInicializado = true;
+      const mapa = L.map('mapa-container').setView([-7.0255, -37.2768], 14);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapa);
+      L.marker([-7.0255, -37.2768]).addTo(mapa).bindPopup("<b>Centro</b><br>Patrulhamento Ativo");
+      L.marker([-7.0210, -37.2820]).addTo(mapa).bindPopup("<b>Jardim Brasília</b><br>Manutenção Elétrica");
+    }
+
+    function abrirModalAlerta() { document.getElementById('modal-alerta').classList.remove('hidden'); }
+    function fecharModalAlerta() { document.getElementById('modal-alerta').classList.add('hidden'); }
+    function abrirModalAchados() { document.getElementById('modal-achados').classList.remove('hidden'); }
+    function fecharModalAchados() { document.getElementById('modal-achados').classList.add('hidden'); }
+
+    function acionarSOS() {
+      if (confirm('ATENÇÃO: Deseja emitir um sinal de SOS de emergência para a rede de Patos?')) {
+        let alertas = JSON.parse(localStorage.getItem('vizinhanca_alertas')) || [];
+        alertas.unshift({ id: Date.now(), bairro: 'EMERGÊNCIA GERAL', tempo: 'Agora mesmo', tipo: 'Segurança', desc: 'Sinal de SOS acionado pelo painel de controlo.', comentarios: [] });
+        localStorage.setItem('vizinhanca_alertas', JSON.stringify(alertas));
+        carregarAlertas();
+        mudarAba('inicio');
+      }
+    }
+
+    function alternarTema() {
+      document.documentElement.classList.toggle('dark');
+      renderIcons();
+    }
+
+    function carregarAlertas() {
+      const feed = document.getElementById('feed-alertas');
+      let alertas = JSON.parse(localStorage.getItem('vizinhanca_alertas')) || [
+        { id: 1, bairro: 'Jardim Brasília', tempo: 'Há 12 minutos', tipo: 'Informativo', desc: 'Manutenção programada na rede elétrica na rua principal nesta quinta-feira à tarde.', comentarios: ['Obrigado pelo aviso!'] }
+      ];
+
+      feed.innerHTML = '';
+      alertas.filter(item => filtroAtual === 'Todos' || item.tipo === filtroAtual).forEach(item => {
+        const corBadge = item.tipo === 'Segurança' ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
+        const comentariosHtml = (item.comentarios || []).map(c => `<div class="text-[10px] bg-slate-100 dark:bg-slate-900 p-1.5 rounded-lg text-slate-500 dark:text-slate-400 mt-1">💬 ${c}</div>`).join('');
+
+        feed.innerHTML += `
+          <article class="p-3.5 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 shadow-sm space-y-2">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-full bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center text-[10px] font-bold text-indigo-600 dark:text-indigo-400">
+                  ${item.bairro.substring(0,2).toUpperCase()}
+                </div>
+                <div>
+                  <h4 class="text-xs font-bold text-slate-900 dark:text-slate-200">${item.bairro}</h4>
+                  <p class="text-[9px] text-slate-400">${item.tempo}</p>
+                </div>
+              </div>
+              <span class="px-2 py-0.5 rounded-full text-[9px] font-semibold border ${corBadge}">${item.tipo}</span>
+            </div>
+            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">${item.desc}</p>
+            <div class="pt-1 border-t border-slate-100 dark:border-slate-700/50">
+              ${comentariosHtml}
+              <button onclick="adicionarComentario(${item.id})" class="text-[10px] text-indigo-500 font-semibold mt-1 hover:underline">+ Responder / Comentar</button>
+            </div>
+          </article>
+        `;
+      });
+      renderIcons();
+    }
+
+    function salvarAlerta(tipo) {
+      const bairro = document.getElementById('input-bairro').value.trim();
+      const desc = document.getElementById('input-descricao').value.trim();
+      if (!bairro || !desc) { alert('Preencha o bairro e a descrição.'); return; }
+
+      let alertas = JSON.parse(localStorage.getItem('vizinhanca_alertas')) || [];
+      alertas.unshift({ id: Date.now(), bairro, tempo: 'Agora mesmo', tipo, desc, comentarios: [] });
+      localStorage.setItem('vizinhanca_alertas', JSON.stringify(alertas));
+
+      document.getElementById('input-bairro').value = '';
+      document.getElementById('input-descricao').value = '';
+      fecharModalAlerta();
+      carregarAlertas();
+    }
+
+    function adicionarComentario(id) {
+      const txt = prompt('Digite o seu comentário:');
+      if (txt) {
+        let alertas = JSON.parse(localStorage.getItem('vizinhanca_alertas')) || [];
+        let idx = alertas.findIndex(a => a.id === id);
+        if (idx !== -1) {
+          if (!alertas[idx].comentarios) alertas[idx].comentarios = [];
+          alertas[idx].comentarios.push(txt);
+          localStorage.setItem('vizinhanca_alertas', JSON.stringify(alertas));
+          carregarAlertas();
+        }
+      }
+    }
+
+    function carregarAchados() {
+      const feed = document.getElementById('feed-achados');
+      let achados = JSON.parse(localStorage.getItem('vizinhanca_achados')) || [
+        { titulo: 'Molho de Chaves no Centro', desc: 'Encontrado no calçadão do Centro próximo ao Banco. Contacto na recepção.' }
+      ];
+
+      feed.innerHTML = '';
+      achados.forEach(item => {
+        feed.innerHTML += `
+          <div class="p-3.5 bg-white dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700/60 shadow-sm space-y-1">
+            <h4 class="text-xs font-bold text-amber-500">🔍 ${item.titulo}</h4>
+            <p class="text-xs text-slate-600 dark:text-slate-300">${item.desc}</p>
+          </div>
+        `;
+      });
+    }
+
+    function salvarAchado() {
+      const titulo = document.getElementById('input-item-titulo').value.trim();
+      const desc = document.getElementById('input-item-desc').value.trim();
+      if (!titulo || !desc) { alert('Preencha todos os campos.'); return; }
+
+      let achados = JSON.parse(localStorage.getItem('vizinhanca_achados')) || [];
+      achados.unshift({ titulo, desc });
+      localStorage.setItem('vizinhanca_achados', JSON.stringify(achados));
+
+      document.getElementById('input-item-titulo').value = '';
+      document.getElementById('input-item-desc').value = '';
+      fecharModalAchados();
+      carregarAchados();
+    }
+
+    function filtrarFeed(cat) {
+      filtroAtual = cat;
+      ['Todos', 'Segurança', 'Informativo'].forEach(c => {
+        document.getElementById('filter-' + c).className = c === cat ? "px-3 py-1 rounded-full bg-indigo-600 text-white font-semibold" : "px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-medium";
+      });
+      carregarAlertas();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      carregarAlertas();
+      carregarAchados();
+      renderIcons();
+    });
+  </script>
+</body>
+</html>

@@ -1,259 +1,438 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-PT" class="h-full dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vizinhança Ativa PRO - Dashboard Único</title>
-    <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <style>
-        :root { --bg-color: #0b132b; --card-bg: #1c2541; --border-color: #3a506b; --text-color: #fff; --accent-color: #00f5d4; }
-        body.light-theme { --bg-color: #f1f5f9; --card-bg: #ffffff; --border-color: #cbd5e1; --text-color: #1e293b; --accent-color: #0284c7; }
-        body { background-color: var(--bg-color); color: var(--text-color); font-family: Arial, sans-serif; margin: 0; padding: 12px; transition: background 0.3s, color 0.3s; }
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        h2 { font-size: 1.1rem; color: var(--accent-color); margin: 0; }
-        .status-badge { font-size: 0.75rem; padding: 4px 10px; border-radius: 6px; font-weight: bold; background: #22c55e; color: white; display: inline-block; margin-bottom: 12px; }
-        .theme-btn { background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
-        .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
-        .card.sos-border { border-left: 6px solid #ff4d4d; }
-        .section-title { font-size: 1.05rem; font-weight: bold; color: var(--accent-color); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
-        .btn-sos { background-color: #ff4d4d; color: white; border: none; padding: 16px; width: 100%; font-size: 1.1rem; font-weight: bold; border-radius: 10px; cursor: pointer; margin-top: 12px; box-shadow: 0 4px 10px rgba(255, 77, 77, 0.4); transition: transform 0.1s; }
-        .btn-sos:active { transform: scale(0.97); }
-        .btn-sec { background-color: #3b82f6; color: white; border: none; padding: 14px; width: 100%; font-size: 1rem; font-weight: bold; border-radius: 10px; cursor: pointer; margin-top: 10px; }
-        .btn-mini { background-color: #3b82f6; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; cursor: pointer; margin-right: 6px; margin-top: 8px; }
-        .btn-whatsapp { background-color: #22c55e; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-block; margin-top: 8px; }
-        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0 14px 0; background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
-        label { font-size: 0.9rem; font-weight: bold; opacity: 0.9; }
-        .badge { background: #ff4d4d; color: white; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; }
-        .gps-box { background: rgba(0, 245, 212, 0.1); border: 1px dashed var(--accent-color); padding: 12px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 12px; line-height: 1.4; }
-        #mapaCentral { width: 100%; height: 240px; border-radius: 8px; margin-bottom: 12px; border: 1px solid var(--border-color); }
-        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px; }
-        .stat-card { background: var(--bg-color); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; text-align: center; }
-        .stat-card h4 { margin: 0; font-size: 1.4rem; color: var(--accent-color); }
-        .stat-card p { margin: 4px 0 0 0; font-size: 0.8rem; opacity: 0.8; }
-        .contact-row { display: flex; justify-content: space-between; align-items: center; background: var(--bg-color); padding: 12px; border-radius: 8px; margin-bottom: 8px; border: 1px solid var(--border-color); }
-        .contact-btn { background: #22c55e; color: #fff; padding: 10px 18px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.95rem; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Vizinhança Segura - Patos/PB</title>
+  
+  <meta name="theme-color" content="#4f46e5" />
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' }</script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+    #mapa-container { height: 280px; width: 100%; border-radius: 1rem; z-index: 1; }
+    .toast-anim { animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+    @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  </style>
 </head>
-<body>
-    <div class="header-top">
-        <h2>🛡️ Vizinhança Ativa PRO</h2>
-        <button class="theme-btn" onclick="alternarTema()">🌙 Tema</button>
-    </div>
-    <div><span id="networkStatus" class="status-badge">🟢 PWA Seguro & GPS Ativo</span></div>
 
-    <div class="card sos-border">
-        <div class="section-title">🚨 Disparar Emergência com GPS</div>
-        <label>Morador:</label>
-        <input type="text" id="nomeCliente" value="Anderson Pereira Silva">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- Container Toast Notification -->
+  <div id="toast-container" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-xs px-2 pointer-events-none"></div>
+
+  <div class="flex flex-col min-h-screen max-w-md mx-auto w-full bg-slate-900 border-x border-slate-800 shadow-2xl relative pb-24">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-600/30 font-bold">
+          <i data-lucide="shield-check" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <h1 class="text-xs font-bold text-slate-900 dark:text-white leading-tight">Vizinhança Segura</h1>
+            <span id="rede-status" class="w-2 h-2 rounded-full bg-emerald-500" title="Online"></span>
+          </div>
+          <p id="morador-info" class="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-0.5 font-medium">
+            <i data-lucide="map-pin" class="w-3 h-3 text-indigo-500"></i> Patos - PB
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-1.5">
+        <button onclick="abrirModalSOS()" class="px-3 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-500 text-[11px] font-bold flex items-center gap-1 active:scale-95 transition-transform">
+          <i data-lucide="alert-octagon" class="w-3.5 h-3.5"></i> SOS
+        </button>
+        <button onclick="alternarTema()" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-700/50 flex items-center justify-center text-slate-300">
+          <i data-lucide="moon" id="icone-tema" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="flex-1 p-4 space-y-5">
+
+      <!-- ABA INÍCIO -->
+      <div id="tab-inicio" class="space-y-5">
+        <section class="rounded-3xl bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-800 p-5 text-white shadow-xl relative overflow-hidden">
+          <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-semibold uppercase bg-white/15 text-indigo-100 border border-white/10 mb-2.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Sistema Protegido v10.0 (XSS Safe)
+          </span>
+          <h2 class="text-lg font-bold leading-snug">Monitorização Comunitária de Patos</h2>
+          <p class="text-[11px] text-indigo-100/80 mt-1">Geolocalização GPS, Áudio, Foto e SOS Rápido.</p>
+        </section>
+
+        <!-- Botões Rápidos -->
+        <section class="grid grid-cols-3 gap-2.5">
+          <button onclick="abrirModalAlerta()" class="flex flex-col items-center justify-center p-3.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-700/60 shadow-sm active:scale-95 text-center gap-1.5">
+            <i data-lucide="alert-triangle" class="w-5 h-5 text-indigo-500"></i>
+            <span class="text-[11px] font-bold text-slate-100">Alerta</span>
+          </button>
+          <button onclick="mudarAba('mapa')" class="flex flex-col items-center justify-center p-3.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-700/60 shadow-sm active:scale-95 text-center gap-1.5">
+            <i data-lucide="map" class="w-5 h-5 text-violet-500"></i>
+            <span class="text-[11px] font-bold text-slate-100">Mapa GPS</span>
+          </button>
+          <button onclick="mudarAba('perfil')" class="flex flex-col items-center justify-center p-3.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-700/60 shadow-sm active:scale-95 text-center gap-1.5">
+            <i data-lucide="user-check" class="w-5 h-5 text-amber-500"></i>
+            <span class="text-[11px] font-bold text-slate-100">Perfil</span>
+          </button>
+        </section>
+
+        <!-- Feed de Alertas -->
+        <section class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Atividade Recente</h3>
+            <span onclick="carregarAlertas()" class="text-[11px] font-semibold text-indigo-400 cursor-pointer">Atualizar</span>
+          </div>
+          <div id="feed-alertas" class="space-y-2.5"></div>
+        </section>
+      </div>
+
+      <!-- ABA MAPA GPS -->
+      <div id="tab-mapa" class="hidden space-y-4">
+        <div class="flex justify-between items-center">
+          <div>
+            <h2 class="text-sm font-bold text-white">Mapa com GPS ao Vivo</h2>
+            <p class="text-[11px] text-slate-400">Patos/PB - Monitoramento em Tempo Real</p>
+          </div>
+          <button onclick="obterLocalizacaoGPS()" class="px-3 py-1.5 rounded-xl bg-indigo-600 text-white text-[11px] font-bold flex items-center gap-1">
+            <i data-lucide="crosshair" class="w-3.5 h-3.5"></i> Centrar GPS
+          </button>
+        </div>
+        <div id="mapa-container"></div>
+      </div>
+
+      <!-- ABA PERFIL -->
+      <div id="tab-perfil" class="hidden space-y-4 py-2">
+        <div class="p-4 bg-slate-800/80 rounded-2xl border border-slate-700 space-y-3">
+          <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+            <i data-lucide="shield" class="w-4 h-4 text-indigo-400"></i> Identificação do Morador
+          </h3>
+          <input id="perfil-nome" type="text" maxlength="50" placeholder="Seu Nome Completo" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white" />
+          <select id="perfil-bairro" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">
+            <option value="Centro">Centro</option>
+            <option value="Jardim Brasília">Jardim Brasília</option>
+            <option value="Belo Horizonte">Belo Horizonte</option>
+            <option value="Salgadinho">Salgadinho</option>
+            <option value="Maternidade">Maternidade</option>
+            <option value="Jatobá">Jatobá</option>
+          </select>
+          <button onclick="salvarPerfil()" class="w-full py-2.5 bg-indigo-600 text-white font-bold rounded-xl text-xs">Guardar Perfil</button>
+        </div>
+
+        <div class="p-4 bg-slate-800/80 rounded-2xl border border-slate-700 space-y-2">
+          <p class="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+            <i data-lucide="phone-call" class="w-3.5 h-3.5 text-rose-500"></i> Contactos Úteis em Patos
+          </p>
+          <div class="grid grid-cols-2 gap-2 text-[11px]">
+            <a href="tel:190" class="p-2 rounded-xl bg-slate-900 border border-slate-700 flex justify-between"><span>Polícia Militar</span><span class="font-bold text-indigo-400">190</span></a>
+            <a href="tel:192" class="p-2 rounded-xl bg-slate-900 border border-slate-700 flex justify-between"><span>SAMU</span><span class="font-bold text-rose-400">192</span></a>
+            <a href="tel:153" class="p-2 rounded-xl bg-slate-900 border border-slate-700 flex justify-between"><span>Guarda Municipal</span><span class="font-bold text-emerald-400">153</span></a>
+            <a href="tel:193" class="p-2 rounded-xl bg-slate-900 border border-slate-700 flex justify-between"><span>Bombeiros</span><span class="font-bold text-amber-400">193</span></a>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Modal SOS Avançado -->
+    <div id="modal-sos" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+      <div class="bg-slate-900 border border-rose-500/40 w-full max-w-sm rounded-3xl p-5 space-y-4 shadow-2xl text-center">
+        <div class="w-12 h-12 bg-rose-500/20 text-rose-500 rounded-full flex items-center justify-center mx-auto">
+          <i data-lucide="alert-octagon" class="w-6 h-6"></i>
+        </div>
+        <h3 class="text-base font-bold text-white">EMERGÊNCIA DE SEGURANÇA</h3>
+        <p class="text-xs text-slate-300">Escolha o serviço de emergência para efetuar a ligação imediatamente:</p>
+        <div class="space-y-2">
+          <a href="tel:190" onclick="dispararAlertaSOS('Polícia Militar')" class="w-full py-2.5 bg-rose-600 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2">
+            <i data-lucide="phone" class="w-4 h-4"></i> Ligar 190 (Polícia Militar)
+          </a>
+          <a href="tel:192" onclick="dispararAlertaSOS('SAMU')" class="w-full py-2.5 bg-indigo-600 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2">
+            <i data-lucide="phone" class="w-4 h-4"></i> Ligar 192 (SAMU)
+          </a>
+          <a href="tel:153" onclick="dispararAlertaSOS('Guarda Municipal')" class="w-full py-2.5 bg-emerald-600 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2">
+            <i data-lucide="phone" class="w-4 h-4"></i> Ligar 153 (Guarda Municipal)
+          </a>
+        </div>
+        <button onclick="fecharModalSOS()" class="text-xs text-slate-400 font-semibold hover:underline">Cancelar</button>
+      </div>
+    </div>
+
+    <!-- Modal Novo Alerta -->
+    <div id="modal-alerta" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-4">
+      <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-3xl p-5 space-y-3 shadow-2xl">
+        <div class="flex justify-between items-center">
+          <h3 class="text-sm font-bold text-white">Novo Alerta Comunitário</h3>
+          <button onclick="fecharModalAlerta()" class="text-slate-400 font-bold text-sm">✕</button>
+        </div>
         
-        <div class="gps-box" id="gpsInfoBox">📍 <b>Estado GPS:</b> A obter coordenadas em Patos-PB...</div>
-        <button class="btn-sec" onclick="capturarGPS(true)" style="margin-top:0; margin-bottom:12px;">🔄 Atualizar Posição GPS</button>
-
-        <label>Tipo de Emergência:</label>
-        <select id="tipoAlerta">
-            <option value="SOS Pânico">🚨 SOS Pânico Geral</option>
-            <option value="Atividade Suspeita">👁️ Atividade Suspeita</option>
-            <option value="Incêndio / Acidente">🔥 Incêndio / Acidente</option>
-            <option value="Emergência Médica">❤ Emergência Médica</option>
+        <select id="input-bairro" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">
+          <option value="Centro">Centro</option>
+          <option value="Jardim Brasília">Jardim Brasília</option>
+          <option value="Belo Horizonte">Belo Horizonte</option>
+          <option value="Salgadinho">Salgadinho</option>
+          <option value="Maternidade">Maternidade</option>
+          <option value="Jatobá">Jatobá</option>
         </select>
+        
+        <textarea id="input-descricao" rows="2" maxlength="280" placeholder="O que está a acontecer? (máx. 280 caracteres)" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white"></textarea>
 
-        <label>Detalhes:</label>
-        <textarea id="textoOcorrencia" rows="3" placeholder="Descreva o ocorrido..."></textarea>
-
-        <button class="btn-sos" id="btnSosPrincipal" onclick="confirmarEnvioSOS()">🚨 DISPARAR ALERTA SUPREME</button>
-        <p id="statusEnvio" style="font-size: 0.9rem; color: #34d399; text-align: center; margin-top: 10px; font-weight: bold;"></p>
-    </div>
-
-    <div class="card">
-        <div class="section-title">🖥️️ Central de Ocorrências & Radar</div>
-        <div class="stats-grid">
-            <div class="stat-card"><h4 id="statTotal">0</h4><p>Total Alertas</p></div>
-            <div class="stat-card"><h4 id="statPanico">0</h4><p>SOS Pânico</p></div>
+        <!-- Gravação de Áudio -->
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="gravarAudio()" id="btn-audio" class="flex-1 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs font-semibold text-amber-400 flex items-center justify-center gap-1">
+            <i data-lucide="mic" class="w-4 h-4"></i> Gravar Voz (10s)
+          </button>
+          <span id="status-audio" class="text-[10px] text-slate-400"></span>
         </div>
-        <div id="mapaCentral"></div>
-        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-            <button class="btn-sec" style="margin:0;" onclick="centrarNoUtilizador()">📍 Centrar em Mim</button>
-            <select id="filtroTipo" onchange="carregarCentral()" style="margin:0;">
-                <option value="TODOS">🔍 Todos os Tipos</option>
-                <option value="SOS Pânico">SOS Pânico</option>
-                <option value="Atividade Suspeita">Atividade Suspeita</option>
-                <option value="Incêndio / Acidente">Incêndio / Acidente</option>
-                <option value="Emergência Médica">Emergência Médica</option>
-            </select>
+
+        <!-- Foto Câmera -->
+        <div>
+          <button type="button" onclick="iniciarCamera()" class="w-full py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs font-semibold text-indigo-400 flex items-center justify-center gap-1">
+            <i data-lucide="camera" class="w-4 h-4"></i> Tirar Foto em Tempo Real
+          </button>
+          <div id="camera-container" class="hidden mt-2 space-y-1">
+            <video id="webcam" autoplay playsinline class="w-full h-32 bg-black rounded-xl object-cover"></video>
+            <button type="button" onclick="capturarFoto()" class="w-full py-1 bg-indigo-600 text-white text-[11px] font-bold rounded-lg">Capturar Foto</button>
+          </div>
+          <canvas id="canvas-foto" class="hidden"></canvas>
+          <img id="preview-foto" class="hidden w-full h-24 object-cover rounded-xl mt-2 border border-indigo-500" />
         </div>
-        <div id="listaCentral">A carregar ocorrências...</div>
+
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <button onclick="salvarAlerta('Informativo')" class="py-2.5 bg-slate-800 rounded-xl text-xs font-semibold text-emerald-400">📢 Informar</button>
+          <button onclick="salvarAlerta('Segurança')" class="py-2.5 bg-rose-500/20 border border-rose-500/30 rounded-xl text-xs font-semibold text-rose-400">🚨 Segurança</button>
+        </div>
+      </div>
     </div>
 
-    <div class="card">
-        <div class="section-title">📢 Mural Comunitário</div>
-        <textarea id="textoMural" rows="2" placeholder="Escreva um aviso para os vizinhos..."></textarea>
-        <button class="btn-sec" onclick="publicarMural()">Publicar Aviso no Mural</button>
-        <div id="listaMural" style="margin-top: 10px;">A carregar mural...</div>
-    </div>
+    <!-- Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-slate-900/95 backdrop-blur-md border-t border-slate-800 px-8 py-3 flex justify-between items-center z-40">
+      <button onclick="mudarAba('inicio')" id="btn-inicio" class="flex flex-col items-center gap-1 text-indigo-400 font-bold text-[10px]">
+        <i data-lucide="home" class="w-5 h-5"></i><span>Início</span>
+      </button>
+      <button onclick="mudarAba('mapa')" id="btn-mapa" class="flex flex-col items-center gap-1 text-slate-400 font-medium text-[10px]">
+        <i data-lucide="map" class="w-5 h-5"></i><span>Mapa GPS</span>
+      </button>
+      <button onclick="mudarAba('perfil')" id="btn-perfil" class="flex flex-col items-center gap-1 text-slate-400 font-medium text-[10px]">
+        <i data-lucide="user" class="w-5 h-5"></i><span>Perfil</span>
+      </button>
+    </nav>
 
-    <div class="card">
-        <div class="section-title">📋 Alertas Disparados por Mim</div>
-        <div id="listaHistorico">A carregar histórico...</div>
-    </div>
+  </div>
 
-    <div class="card">
-        <div class="section-title">📞 Telefones de Emergência Rápida</div>
-        <div class="contact-row"><div><b>Polícia Militar</b><br><small>190</small></div><a href="tel:190" class="contact-btn">Ligar 190</a></div>
-        <div class="contact-row"><div><b>Bombeiros</b><br><small>193</small></div><a href="tel:193" class="contact-btn">Ligar 193</a></div>
-        <div class="contact-row"><div><b>SAMU</b><br><small>192</small></div><a href="tel:192" class="contact-btn">Ligar 192</a></div>
-    </div>
+  <script>
+    let mapaInstance = null;
+    let fotoDataUrl = null;
+    let audioBlobUrl = null;
+    let streamCamera = null;
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let ultimoEnvio = 0; // Rate limit anti-spam
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
-        const SUPABASE_URL = 'https://urgtiuscnoboawqndcqt.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVyZ3RpdXNjbm9ib2F3cW5kY3F0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExMTc4NDIsImV4cCI6MjEwNjY5Mzg0Mn0.IwbOIXJsdpgQl26_FWniiuKmEaL-ZrX-8K61B-jljWg';
-        let map, markersLayer, ultimoIdConhecido = 0, cliquePendente = false;
-        let minhaLat = -7.0158, minhaLon = -37.2801;
+    // Função de Sanitização Anti-XSS
+    function escapeHtml(text) {
+      if (!text) return '';
+      return text.replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+    }
 
-        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.io.js'); }
-        if (Notification.permission !== "granted") { Notification.requestPermission(); }
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').then(() => {
+        Notification.requestPermission();
+      }).catch(console.error);
+    }
 
-        window.onload = function() {
-            capturarGPS(false);
-            carregarCentral();
-            carregarMural();
-            carregarHistorico();
-            setTimeout(initMapa, 400);
-            setInterval(() => { carregarCentral(); carregarMural(); }, 10000);
+    function mostrarToast(mensagem, tipo = 'sucesso') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const cor = tipo === 'erro' ? 'bg-rose-600 text-white' : 'bg-indigo-600 text-white';
+      toast.className = `toast-anim p-3 rounded-2xl shadow-xl ${cor} text-xs font-bold text-center pointer-events-auto`;
+      toast.innerText = mensagem;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    function renderIcons() {
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function mudarAba(aba) {
+      ['inicio', 'mapa', 'perfil'].forEach(a => {
+        document.getElementById('tab-' + a).classList.add('hidden');
+        document.getElementById('btn-' + a).className = "flex flex-col items-center gap-1 text-slate-400 font-medium text-[10px]";
+      });
+      document.getElementById('tab-' + aba).classList.remove('hidden');
+      document.getElementById('btn-' + aba).className = "flex flex-col items-center gap-1 text-indigo-400 font-bold text-[10px]";
+
+      if (aba === 'mapa' && !mapaInstance) setTimeout(initMapa, 250);
+      renderIcons();
+    }
+
+    function initMapa() {
+      if (mapaInstance || typeof L === 'undefined') return;
+      mapaInstance = L.map('mapa-container').setView([-7.0255, -37.2768], 14);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapaInstance);
+      L.marker([-7.0255, -37.2768]).addTo(mapaInstance).bindPopup("<b>Centro - Patos/PB</b>");
+    }
+
+    function obterLocalizacaoGPS() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+          const { latitude, longitude } = pos.coords;
+          if (mapaInstance) {
+            mapaInstance.setView([latitude, longitude], 16);
+            L.marker([latitude, longitude]).addTo(mapaInstance).bindPopup("📍 Sua Posição GPS").openPopup();
+          }
+          mostrarToast("GPS Centrado em Patos!");
+        }, () => mostrarToast("Ative a permissão de GPS.", 'erro'));
+      }
+    }
+
+    async function gravarAudio() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+        mediaRecorder.onstop = () => {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          audioBlobUrl = URL.createObjectURL(audioBlob);
+          document.getElementById('status-audio').innerText = "✅ Áudio pronto!";
+          mostrarToast("Gravação concluída!");
         };
+        mediaRecorder.start();
+        document.getElementById('status-audio').innerText = "🔴 A gravar...";
+        setTimeout(() => { if (mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.stop(); }, 10000);
+      } catch {
+        mostrarToast("Microfone não disponível.", 'erro');
+      }
+    }
 
-        function alternarTema() { document.body.classList.toggle('light-theme'); }
-        function initMapa() {
-            if(map) return;
-            map = L.map('mapaCentral').setView([minhaLat, minhaLon], 14);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
-            markersLayer = L.layerGroup().addTo(map);
-            carregarCentral();
-        }
-        function centrarNoUtilizador() { if(map) map.setView([minhaLat, minhaLon], 15); }
-        function capturarGPS(comAlerta) {
-            const box = document.getElementById('gpsInfoBox');
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    pos => {
-                        minhaLat = pos.coords.latitude; minhaLon = pos.coords.longitude;
-                        box.innerHTML = `✅ <b>GPS Ativo & Sincronizado</b><br>Lat: ${minhaLat.toFixed(5)}, Lon: ${minhaLon.toFixed(5)}`;
-                        if(comAlerta) alert("✅ Posição GPS atualizada!");
-                        if(map) { map.setView([minhaLat, minhaLon], 15); carregarCentral(); }
-                    },
-                    err => { box.innerHTML = `⚠️ <b>GPS Indisponível</b> (A usar Patos-PB)`; },
-                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-                );
-            }
-        }
-        function confirmarEnvioSOS() {
-            const btn = document.getElementById('btnSosPrincipal');
-            if (!cliquePendente) {
-                cliquePendente = true;
-                btn.style.backgroundColor = "#eab308";
-                btn.innerText = "⚠️ CONFIRMAR TOQUE (CLIQUE DE NOVO)";
-                setTimeout(() => {
-                    cliquePendente = false;
-                    btn.style.backgroundColor = "#ff4d4d";
-                    btn.innerText = "🚨 DISPARAR ALERTA SUPREME";
-                }, 4000);
-                return;
-            }
-            cliquePendente = false;
-            btn.style.backgroundColor = "#ff4d4d";
-            btn.innerText = "🚨 DISPARAR ALERTA SUPREME";
-            enviarAlertaGPS();
-        }
-        function enviarAlertaGPS() {
-            const nome = document.getElementById('nomeCliente').value;
-            const tipo = document.getElementById('tipoAlerta').value;
-            const texto = document.getElementById('textoOcorrencia').value;
-            const status = document.getElementById('statusEnvio');
-            status.innerText = "A enviar alerta com GPS...";
-            if("vibrate" in navigator) navigator.vibrate([200, 100, 200]);
-            executarEnvioSupabase(tipo, `${tipo} - ${nome}: ${texto}`, minhaLat, minhaLon);
-        }
-        async function executarEnvioSupabase(tipo, bairro, lat, lon) {
-            const status = document.getElementById('statusEnvio');
-            try {
-                const res = await fetch(`${SUPABASE_URL}/rest/v1/ocorrencias`, {
-                    method: 'POST',
-                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ tipo: tipo, bairro: bairro, latitude: lat, longitude: lon, urgente: true })
-                });
-                if(res.ok) {
-                    status.innerText = "✅ Alerta enviado com segurança!";
-                    let meusAlertas = JSON.parse(localStorage.getItem('meus_alertas') || '[]');
-                    meusAlertas.unshift({ tipo, bairro, data: new Date().toLocaleString() });
-                    localStorage.setItem('meus_alertas', JSON.stringify(meusAlertas));
-                    carregarCentral(); carregarHistorico();
-                    document.getElementById('textoOcorrencia').value = '';
-                } else { status.innerText = "❌ Erro ao enviar."; }
-            } catch(e) { status.innerText = "❌ Falha de rede."; }
-        }
-        function calcularDistancia(lat1, lon1, lat2, lon2) {
-            const R = 6371;
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
-            const d = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return d < 1 ? Math.round(d * 1000) + " m de si" : d.toFixed(1) + " km de si";
-        }
-        async function carregarCentral() {
-            try {
-                const res = await fetch(`${SUPABASE_URL}/rest/v1/ocorrencias?select=*&order=id.desc&limit=20`, {
-                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-                });
-                if(res.ok) {
-                    const dados = await res.json();
-                    document.getElementById('statTotal').innerText = dados.length;
-                    document.getElementById('statPanico').innerText = dados.filter(i => i.tipo === 'SOS Pânico').length;
-                    const filtro = document.getElementById('filtroTipo').value;
-                    const container = document.getElementById('listaCentral');
-                    let html = '';
-                    if(markersLayer) markersLayer.clearLayers();
-                    if(map) L.marker([minhaLat, minhaLon], { icon: L.divIcon({ className: '', html: '📍', iconSize: [22, 22] }) }).addTo(markersLayer);
-                    dados.forEach(item => {
-                        if(map && item.latitude && item.longitude && (filtro === 'TODOS' || item.tipo === filtro)) {
-                            L.marker([item.latitude, item.longitude]).addTo(markersLayer).bindPopup(`<b>${item.tipo}</b><br>${item.bairro}`);
-                        }
-                        if(filtro === 'TODOS' || item.tipo === filtro) {
-                            let dist = item.latitude && item.longitude ? `<span style="font-size:0.8rem; color:var(--accent-color); display:block; margin-top:4px; font-weight:bold;">📍 Distância: ${calcularDistancia(minhaLat, minhaLon, item.latitude, item.longitude)}</span>` : '';
-                            let txtWp = encodeURIComponent(`🚨 *ALERTA VIZINHANÇA* 🚨\n${item.bairro}`);
-                            html += `<div class="card sos-border" style="margin-bottom:10px; padding:12px;"><span class="badge">${item.tipo || 'SOS'}</span><p style="margin:8px 0; font-size:0.95rem;"><b>Info:</b> ${item.bairro}</p>${dist}<div style="margin-top:8px;"><button class="btn-mini" onclick="navigator.clipboard.writeText('${item.bairro}'); alert('Copiado!');">📋 Copiar</button><a class="btn-whatsapp" href="https://api.whatsapp.com/send?text=${txtWp}" target="_blank">📤 WhatsApp</a></div></div>`;
-                        }
-                    });
-                    container.innerHTML = html || '<p>Nenhum alerta.</p>';
-                }
-            } catch(e){}
-        }
-        function carregarHistorico() {
-            const meus = JSON.parse(localStorage.getItem('meus_alertas') || '[]');
-            let html = '';
-            meus.forEach(i => html += `<div class="card" style="margin-bottom:8px; padding:10px;"><span class="badge">${i.tipo}</span><p style="margin:6px 0;">${i.bairro}</p><small style="opacity:0.7;">${i.data}</small></div>`);
-            document.getElementById('listaHistorico').innerHTML = html || '<p>Nenhum alerta disparado.</p>';
-        }
-        async function publicarMural() {
-            const texto = document.getElementById('textoMural').value;
-            if(!texto) return alert('Escreva algo.');
-            await fetch(`${SUPABASE_URL}/rest/v1/ocorrencias`, {
-                method: 'POST',
-                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ tipo: 'Mural', bairro: 'Aviso: ' + texto, latitude: minhaLat, longitude: minhaLon, urgente: false })
-            });
-            document.getElementById('textoMural').value = '';
-            carregarMural();
-        }
-        async function carregarMural() {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/ocorrencias?select=*&order=id.desc&limit=10`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
-            if(res.ok) {
-                const dados = await res.json();
-                let html = '';
-                dados.forEach(item => { if(item.tipo === 'Mural') html += `<div class="card" style="margin-bottom:8px; padding:10px;"><p style="margin:0;">${item.bairro}</p></div>`; });
-                document.getElementById('listaMural').innerHTML = html || '<p>Sem avisos.</p>';
-            }
-        }
-    </script>
+    async function iniciarCamera() {
+      document.getElementById('camera-container').classList.remove('hidden');
+      try {
+        streamCamera = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+        document.getElementById('webcam').srcObject = streamCamera;
+      } catch {
+        mostrarToast("Câmera não disponível.", 'erro');
+      }
+    }
+
+    function capturarFoto() {
+      const video = document.getElementById('webcam');
+      const canvas = document.getElementById('canvas-foto');
+      canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0);
+      fotoDataUrl = canvas.toDataURL('image/png');
+      const img = document.getElementById('preview-foto');
+      img.src = fotoDataUrl; img.classList.remove('hidden');
+      if (streamCamera) streamCamera.getTracks().forEach(t => t.stop());
+      document.getElementById('camera-container').classList.add('hidden');
+      mostrarToast("Foto anexada com sucesso!");
+    }
+
+    function salvarPerfil() {
+      const nome = escapeHtml(document.getElementById('perfil-nome').value.trim());
+      const bairro = escapeHtml(document.getElementById('perfil-bairro').value);
+      if (!nome) return mostrarToast('Insira o seu nome.', 'erro');
+      localStorage.setItem('vizinhanca_morador', JSON.stringify({ nome, bairro }));
+      document.getElementById('morador-info').innerHTML = `<i data-lucide="map-pin" class="w-3 h-3 text-indigo-500"></i> ${nome} • ${bairro}`;
+      mostrarToast("Perfil de Morador guardado!");
+      mudarAba('inicio');
+    }
+
+    function abrirModalSOS() { document.getElementById('modal-sos').classList.remove('hidden'); }
+    function fecharModalSOS() { document.getElementById('modal-sos').classList.add('hidden'); }
+    
+    function dispararAlertaSOS(servico) {
+      let alertas = JSON.parse(localStorage.getItem('vizinhanca_alertas')) || [];
+      alertas.unshift({ id: Date.now(), bairro: 'EMERGÊNCIA GERAL', tempo: 'Agora mesmo', tipo: 'Segurança', desc: escapeHtml(`🚨 SOS ativado! Chamada efetuada para ${servico}.`), apoios: 0 });
+      localStorage.setItem('vizinhanca_alertas', JSON.stringify(alertas));
+      fecharModalSOS();
+      carregarAlertas();
+    }
+
+    function abrirModalAlerta() { document.getElementById('modal-alerta').classList.remove('hidden'); }
+    function fecharModalAlerta() {
+      document.getElementById('modal-alerta').classList.add('hidden');
+      if (streamCamera) streamCamera.getTracks().forEach(t => t.stop());
+      document.getElementById('camera-container').classList.add('hidden');
+    }
+
+    function salvarAlerta(tipo) {
+      const agora = Date.now();
+      if (agora - ultimoEnvio < 30000) {
+        return mostrarToast("Aguarde 30s entre os envios.", 'erro');
+      }
+
+      const bairro = escapeHtml(document.getElementById('input-bairro').value);
+      const desc = escapeHtml(document.getElementById('input-descricao').value.trim());
+      if (!desc) return mostrarToast('Preencha a descrição.', 'erro');
+
+      let alertas = JSON.parse(localStorage.getItem('vizinhanca_alertas')) || [];
+      alertas.unshift({ id: agora, bairro, tempo: 'Agora mesmo', tipo, desc, foto: fotoDataUrl, audio: audioBlobUrl, apoios: 0 });
+      localStorage.setItem('vizinhanca_alertas', JSON.stringify(alertas));
+
+      ultimoEnvio = agora;
+      document.getElementById('input-descricao').value = '';
+      fotoDataUrl = null; audioBlobUrl = null;
+      document.getElementById('preview-foto').classList.add('hidden');
+      document.getElementById('status-audio').innerText = '';
+      fecharModalAlerta();
+      carregarAlertas();
+      mostrarToast("Alerta publicado com segurança!");
+    }
+
+    function carregarAlertas() {
+      const feed = document.getElementById('feed-alertas');
+      if (!feed) return;
+      let alertas = JSON.parse(localStorage.getItem('vizinhanca_alertas')) || [
+        { id: 1, bairro: 'Jardim Brasília', tempo: 'Há 12 min', tipo: 'Informativo', desc: 'Manutenção na rede elétrica.', apoios: 3 }
+      ];
+
+      feed.innerHTML = '';
+      alertas.forEach(item => {
+        const cor = item.tipo === 'Segurança' ? 'text-rose-400 bg-rose-500/10' : 'text-emerald-400 bg-emerald-500/10';
+        const foto = item.foto ? `<img src="${item.foto}" class="w-full h-28 object-cover rounded-xl mt-1" />` : '';
+        const audio = item.audio ? `<audio controls src="${item.audio}" class="w-full h-8 mt-1"></audio>` : '';
+
+        feed.innerHTML += `
+          <article class="p-3.5 rounded-2xl bg-slate-800 border border-slate-700 space-y-2 text-xs">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-white">${escapeHtml(item.bairro)}</span>
+              <span class="px-2 py-0.5 rounded-full text-[9px] font-semibold ${cor}">${escapeHtml(item.tipo)}</span>
+            </div>
+            <p class="text-slate-300">${escapeHtml(item.desc)}</p>
+            ${foto} ${audio}
+          </article>
+        `;
+      });
+      renderIcons();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      carregarAlertas();
+      const morador = JSON.parse(localStorage.getItem('vizinhanca_morador'));
+      if (morador) {
+        document.getElementById('morador-info').innerHTML = `<i data-lucide="map-pin" class="w-3 h-3 text-indigo-500"></i> ${escapeHtml(morador.nome)} • ${escapeHtml(morador.bairro)}`;
+      }
+      renderIcons();
+    });
+  </script>
 </body>
 </html>
