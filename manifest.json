@@ -1,22 +1,23 @@
 {
-  "short_name": "Vizinhança",
-  "name": "Vizinhança Segura - Patos PB",
+  "id": "/",
+  "name": "Vizinhança Segura - Patos/PB",
+  "short_name": "Vizinhança Segura",
+  "description": "Aplicativo de monitorização comunitária e segurança para Patos/PB.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#090d16",
+  "theme_color": "#4f46e5",
+  "lang": "pt-PT",
+  "dir": "ltr",
+  "categories": ["utilities", "security", "social"],
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/1099/1099680.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/2921/2921222.png",
+      "sizes": "512x512",
       "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "https://cdn-icons-png.flaticon.com/512/1099/1099680.png",
-      "type": "image/png",
-      "sizes": "512x512"
+      "purpose": "any maskable"
     }
-  ],
-  "start_url": "/",
-  "background_color": "#020617",
-  "theme_color": "#4f46e5",
-  "display": "standalone",
-  "orientation": "portrait"
+  ]
 }
-
